@@ -13,10 +13,10 @@ debug:
 	uv run python -m pdb -m src
 
 clean:
-	rm -rf .mypy_cache
-	rm -rf __pycache__
-	rm -rf src/__pycache__
-	rm -rf .pytest_cache
+	find . -type d -name .mypy_cache -exec rm -rf {} +
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type d -name .pytest_cache -exec rm -rf {} +
+	find . -name .DS_Store -delete
 
 lint:
 	flake8 .
