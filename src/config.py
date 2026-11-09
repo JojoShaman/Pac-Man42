@@ -13,8 +13,6 @@ class ConfigError(Exception):
 
 @dataclass
 class Level:
-    width = 15
-    height = 15
 
 @dataclass
 class Config:
