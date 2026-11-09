@@ -17,11 +17,14 @@ class Level:
     height: int = 15
 
 
+def _default_tags() -> list[Level]:
+    return [Level() for _ in range(10)]
+
 
 @dataclass
 class Config:
     highscore_filename: str = "highscore.json"
-    levels: list[Level] = [Level() for _ in range(10)]
+    levels: list[Level] = field(default_factory=_default_tags)
     lives: int = 3
     pacgums: int = 42
     points_per_pacgum: int = 10
