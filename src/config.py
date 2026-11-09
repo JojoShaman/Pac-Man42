@@ -6,6 +6,11 @@ from typing import Any, Callable
 import json
 import logging
 
+
+class ConfigError(Exception):
+    ...
+
+
 @dataclass
 class Level:
     width = 15
