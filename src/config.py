@@ -115,3 +115,32 @@ def load_config(content: str) -> Config:
     except ValueError as e:
         raise ValueError(e)
     return Config(**values)
+
+
+VALIDATE: dict[type[Any] | str | Any, Callable] = {
+    "highscore_filename": _validate_filename,
+    "levels": _validate_levels,
+    "lives": _validate_int,
+    "pacgums": _validate_int,
+    "points_per_pacgum": _validate_int,
+    "points_per_super_pacgum": _validate_int,
+    "points_per_ghost": _validate_int,
+    "seed": _validate_int,
+    "level_max_time": _validate_int,
+    "cheat_mode": _validate_bool
+}
+
+INT_BOUNDS: dict[str, tuple[int, int | None]] = {
+    "lives": (1, 5),
+    "pacgums": (10, 1000),
+    "points_per_pacgum": (0, 1000),
+    "points_per_super_pacgum": (0, 5000),
+    "points_per_ghost": (0, 20000),
+    "seed": (1, None),
+    "level_max_time": (30, 600),
+}
+
+LVL_DIMESION_BOUNDS: dict[str, tuple[int, int]] = {
+    "width": (10, 50),
+    "height": (10, 50)
+}
