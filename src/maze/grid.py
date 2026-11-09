@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from ..maze.direction import Direction
+from src.direction import Direction
 
 
 @dataclass(frozen=True)
