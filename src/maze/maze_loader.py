@@ -11,4 +11,6 @@ def process_maze(width: int, height: int, seed: int) -> Grid:
     # print(vars(gen))
     raw = gen.maze
     # print(raw)
-    return Grid([[Cell(v & 15) for v in row] for row in raw])
+    return Grid(
+        [[Cell(walls=(v & 15), x=x, y=y) for x, v in enumerate(row)]
+         for y, row in enumerate(raw)])
