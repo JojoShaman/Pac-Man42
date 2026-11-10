@@ -5,6 +5,8 @@ from src.direction import Direction
 @dataclass(frozen=True)
 class Cell:
     walls: int
+    x: int
+    y: int
 
     def has_wall(self, d: Direction) -> bool:
         return bool(self.walls & d)

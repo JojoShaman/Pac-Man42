@@ -9,6 +9,7 @@ class MazeError(Exception):
 
 
 def process_maze(width: int, height: int, seed: int) -> Grid:
+<<<<<<< HEAD
     """Process the maze from the MazeGenerator """
     try:
         seed = max(1, seed)
@@ -30,3 +31,12 @@ def _validate_raw(raw: list[list[int]], width: int, height: int) -> None:
     if not all(isinstance(v, int) and 0 <= v <= 15
                for row in raw for v in row):
         raise MazeError("cell value out of range 0-15")
+=======
+    gen = MazeGenerator(size=(width, height), perfect=False, seed=seed)
+    # print(vars(gen))
+    raw = gen.maze
+    # print(raw)
+    return Grid(
+        [[Cell(walls=(v & 15), x=x, y=y) for x, v in enumerate(row)]
+         for y, row in enumerate(raw)])
+>>>>>>> 990614025fa8bcd9b30db308f3718981a3a1ff00
