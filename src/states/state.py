@@ -1,9 +1,10 @@
 from abc import *
 from pygame import Surface
+from pygame.event import Event
 
 class State(ABC):
     @abstractmethod
-    def handle_input(self) -> None:
+    def handle_input(self, events: list[Event]) -> None:
         pass
 
     @abstractmethod
