@@ -1,6 +1,8 @@
 from .states.state import State
 from .states.playing import Playing
+from .rendering.render import load_sprites
 import pygame
+from pygame.event import Event
 
 class App:
     def __init__(self) -> None:
@@ -9,13 +11,20 @@ class App:
     def run(self) -> None:
         pygame.init()
         screen = pygame.display.set_mode((1280, 720))
+        screen.fill("red")
+        load_sprites()
         running = True
-        
+        clock = pygame.time.Clock()
+        dt: float = 0
         while running:
-            for event in pygame.event.get():
+            events: list[Event] = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     running = False
+            self.state.handle_input(events)
+            self.state.update(dt)
             self.state.render(screen)
             pygame.display.flip()
+            dt = clock.tick(60) / 1000
         pygame.quit()
 
