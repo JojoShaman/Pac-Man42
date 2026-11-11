@@ -15,6 +15,7 @@ class Entity(ABC):
         self.y = y
         self.direction: Direction = direction
         self.speed: float = speed
+        self.travelled: float = 0
 
     @abstractmethod
     def choose_direction(self, grid: Grid) -> Direction:
@@ -28,6 +29,7 @@ class Entity(ABC):
         if int(self.x) == self.x and int(self.y) == self.y:
             if grid.cells[int(self.y)][int(self.x)].has_wall(self.direction):
                 self.direction = self.choose_direction(grid)
+                self.travelled = 0
                 return
         old_pos = (rnd(self.x), rnd(self.y))
         self.x += dx * distance
@@ -37,3 +39,4 @@ class Entity(ABC):
             self.x = new_pos[0]
             self.y = new_pos[1]
             self.direction = self.choose_direction(grid)
+        self.travelled += distance
