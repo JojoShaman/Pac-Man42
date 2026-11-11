@@ -17,7 +17,9 @@ def process_maze(width: int, height: int, seed: int) -> Grid:
     except Exception as e:
         raise MazeError(f"Maze Generation failed: {e}")
     _validate_raw(raw, width, height)
-    grid = Grid([[Cell(v & 15, v, row) for v in row] for row in raw])
+    grid = Grid(
+        [[Cell(v & 15, x, y) for x, v in enumerate(row)]
+         for y, row in enumerate(raw)])
     if not grid.is_consistent():
         raise MazeError("Inconsistent walls between neighbouring cells")
     return grid
