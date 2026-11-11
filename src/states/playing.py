@@ -3,6 +3,16 @@ from pygame import Surface
 from ..rendering.render import render_maze
 from ..maze.grid import Grid
 from ..maze.maze_loader import process_maze
+K_DIRECTION: dict[int, Direction] = {
+    K_w: Direction.N,
+    K_d: Direction.E,
+    K_s: Direction.S,
+    K_a: Direction.W,
+    K_UP: Direction.N,
+    K_RIGHT: Direction.E,
+    K_DOWN: Direction.S,
+    K_LEFT: Direction.W
+}
 
 class Playing(State):
     def handle_input(self):
