@@ -27,8 +27,11 @@ class Playing(State):
     def handle_input(self, events: list[Event]) -> None:
         self.intents = Intents()
         for event in events:
-            if event.type == KEYDOWN and event.key in K_DIRECTION:
-                self.intents.direction = K_DIRECTION[event.key]
+            if event.type == KEYDOWN:
+                if event.key in K_DIRECTION:
+                    self.intents.direction = K_DIRECTION[event.key]
+                elif event.key == K_n:
+                    self.intents.next_lvl = True
 
     def update(self, dt):
         self.game.update(dt, self.intents)
