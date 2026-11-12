@@ -8,7 +8,8 @@ import random
 
 class Intents:
     def __init__(self) -> None:
-        self.direction: Direction | None = None 
+        self.direction: Direction | None = None
+        self.next_lvl: bool = False
 
 class Game:
     def __init__(self) -> None:
