@@ -20,6 +20,10 @@ class Playing(State):
         self.m_surf: Surface | None = None
         self.intents: Intents = Intents() 
 
+    def handle_input(self, events: list[Event]) -> None:
+        for event in events:
+            if event.type == KEYDOWN and event.key in K_DIRECTION:
+                self.intents.direction = K_DIRECTION[event.key]
 
     def update(self, dt):
         return None
