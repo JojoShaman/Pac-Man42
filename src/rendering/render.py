@@ -45,8 +45,8 @@ def window_pos(x: float, y: float,
 def compute_layout(screen: Surface, maze: Grid) -> tuple[int, int, int]:
     w, h = screen.get_size()
     gw, gh = maze.width, maze.height
-    free_h = h - h // 10
-    free_w = w - w // 10
+    free_h = h - h // 5
+    free_w = w - w // 5
     cell_size = min(free_w // gw, free_h // gh)
     offset_x = (w - gw * cell_size) // 2 
     offset_y = (h - gh * cell_size) // 2
