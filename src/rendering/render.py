@@ -54,7 +54,8 @@ def compute_layout(screen: Surface, maze: Grid) -> tuple[int, int, int]:
 
 def render_maze(screen: Surface, grid: Grid) -> Surface:
     maze = Surface(screen.get_size(), SRCALPHA)
-    screen.fill('black')
+    background: Surface = Surface(screen.get_size(), SRCALPHA)
+    background.fill('black')
     size, off_x, off_y = compute_layout(maze, grid)
     for row in grid.cells:
         for cell in row:
@@ -80,6 +81,6 @@ def render_maze(screen: Surface, grid: Grid) -> Surface:
                 cell.has_wall(wall) for wall in [
                     Direction.N, Direction.S, Direction.E, Direction.W]):
                 left, top = top_left
-                screen.fill('blue', Rect(left, top, size, size))
-    screen.blit(maze, (0, 0))
-    return screen
+                background.fill('blue', Rect(left, top, size, size))
+    background.blit(maze, (0, 0))
+    return background
