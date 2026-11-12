@@ -1,9 +1,10 @@
 from .state import State
 from pygame import *
 from pygame.event import Event
-from ..rendering.render import render_maze, draw_pacman
+from ..rendering.render import render_maze, draw_pacman, draw_pacgums
 from ..game import Game, Intents
 from ..direction import Direction
+from ..context import Context
 
 K_DIRECTION: dict[int, Direction] = {
     K_w: Direction.N,
