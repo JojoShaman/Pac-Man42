@@ -29,6 +29,21 @@ class Game:
             self.levels[self.current_lvl].width,
             self.levels[self.current_lvl].height,
             self.seed)
+
+
+    def init_pacgums(self) -> list[tuple[int, int]]:
+        pacgums: list[tuple[int, int]] = []
+        w = self.levels[self.current_lvl].width
+        h = self.levels[self.current_lvl].height
+        for _ in range(self.context.config.pacgums):
+            while True:
+                x, y = (random.randint(0, w - 1), random.randint(0, h - 1))
+                cell = self.grid.cells[y][x]
+                if not all(cell.has_wall(wall) for wall in [
+                    Direction.N, Direction.E, Direction.S, Direction.W]):
+                    break
+            pacgums.append((x, y))
+        return pacgums
     def update(self, dt: float, intents: Intents) -> None:
         self.player.set_wanted_direction(intents.direction)
         self.player.update(dt, self.grid)
