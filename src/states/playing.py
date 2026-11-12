@@ -15,8 +15,11 @@ K_DIRECTION: dict[int, Direction] = {
 }
 
 class Playing(State):
-    def handle_input(self):
-        pass
+    def __init__(self) -> None:
+        self.game: Game = Game()
+        self.m_surf: Surface | None = None
+        self.intents: Intents = Intents() 
+
 
     def update(self, dt):
         return None
