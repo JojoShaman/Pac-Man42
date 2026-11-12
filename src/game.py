@@ -24,6 +24,11 @@ class Game:
             self.grid.width // 2, self.grid.height // 2,
             Direction.S, 4)
 
+    def get_grid(self) -> Grid:
+        return process_maze(
+            self.levels[self.current_lvl].width,
+            self.levels[self.current_lvl].height,
+            self.seed)
     def update(self, dt: float, intents: Intents) -> None:
         self.player.set_wanted_direction(intents.direction)
         self.player.update(dt, self.grid)
