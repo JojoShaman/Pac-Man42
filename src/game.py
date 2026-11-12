@@ -51,5 +51,14 @@ class Game:
             self.current_lvl += 1
             self.seed = random.getrandbits(32)
             self.grid = self.get_grid()
+
+    def increase_score(self) -> None:
+        player_pos: tuple[float, float] = (self.player.x, self.player.y)
+        if player_pos in self.pacgums:
+            self.score += self.context.config.points_per_pacgum
+            self.pacgums.remove((
+                int(player_pos[0]),
+                int(player_pos[1])))
+
     def update(self, dt: float, intents: Intents) -> None:
         self.player.set_wanted_direction(intents.direction)
