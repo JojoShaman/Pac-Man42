@@ -25,6 +25,16 @@ def load_sprites() -> None:
     for _, pacman in PACMAN.items():
         for d, r in rotation:
             PM_ROTATE.setdefault(d, []).append(transform.rotate(pacman, r))
+
+def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
+    step = int(player.travelled / 0.25) % 4
+    pacman = transform.scale(PM_ROTATE[player.direction][step], (26, 26))
+    x = player.x
+    y = player.y
+    size, off_x, off_y = compute_layout(screen, grid)
+    re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
+    screen.blit(pacman, pacman.get_rect(center=re_center)) 
+
 def window_pos(x: float, y: float,
                offset_x: int, offset_y: int,
                cell_size: int) -> tuple[int, int]:
