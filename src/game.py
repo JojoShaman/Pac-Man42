@@ -12,8 +12,14 @@ class Intents:
         self.next_lvl: bool = False
 
 class Game:
-    def __init__(self) -> None:
-        self.grid: Grid = process_maze(15, 15, 42)
+    def __init__(self, context: Context) -> None:
+        self.context: Context = context
+        self.levels: list[Level] = context.config.levels
+        self.current_lvl: int = 0
+        self.seed: int = context.config.seed
+        self.grid: Grid = self.get_grid()
+        self.pacgums: list[tuple[int, int]] = self.init_pacgums()
+        self.score: int = 0
         self.player: Player = Player(
             self.grid.width // 2, self.grid.height // 2,
             Direction.S, 4)
