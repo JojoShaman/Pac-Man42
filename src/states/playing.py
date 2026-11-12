@@ -26,7 +26,8 @@ class Playing(State):
                 self.intents.direction = K_DIRECTION[event.key]
 
     def update(self, dt):
-        return None
+        self.game.update(dt, self.intents)
+        return self
 
     def render(self, screen: Surface):
         grid: Grid = process_maze(15, 15, 42)
