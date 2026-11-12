@@ -1,12 +1,15 @@
 from .states.state import State
 from .states.playing import Playing
 from .rendering.render import load_sprites
+from .config import Config
 import pygame
 from pygame.event import Event
+from .context import Context
 
 class App:
-    def __init__(self) -> None:
-        self.state: State = Playing()
+    def __init__(self, config: Config) -> None:
+        self.context: Context = Context(config)
+        self.state: State = Playing(self.context)
 
     def run(self) -> None:
         pygame.init()
