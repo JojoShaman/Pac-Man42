@@ -44,6 +44,12 @@ class Game:
                     break
             pacgums.append((x, y))
         return pacgums
+
+
+    def next_level(self) -> None:
+        if self.current_lvl < 9:
+            self.current_lvl += 1
+            self.seed = random.getrandbits(32)
+            self.grid = self.get_grid()
     def update(self, dt: float, intents: Intents) -> None:
         self.player.set_wanted_direction(intents.direction)
-        self.player.update(dt, self.grid)
