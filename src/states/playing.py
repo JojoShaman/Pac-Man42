@@ -1,8 +1,10 @@
 from .state import State
-from pygame import Surface
-from ..rendering.render import render_maze
-from ..maze.grid import Grid
-from ..maze.maze_loader import process_maze
+from pygame import *
+from pygame.event import Event
+from ..rendering.render import render_maze, draw_pacman
+from ..game import Game, Intents
+from ..direction import Direction
+
 K_DIRECTION: dict[int, Direction] = {
     K_w: Direction.N,
     K_d: Direction.E,
