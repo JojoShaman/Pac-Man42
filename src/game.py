@@ -61,4 +61,8 @@ class Game:
                 int(player_pos[1])))
 
     def update(self, dt: float, intents: Intents) -> None:
+        if intents.next_lvl:
+            self.next_level()
         self.player.set_wanted_direction(intents.direction)
+        self.player.update(dt, self.grid)
+        self.increase_score()
