@@ -25,6 +25,7 @@ class Playing(State):
         self.context: Context = context
 
     def handle_input(self, events: list[Event]) -> None:
+        self.intents = Intents()
         for event in events:
             if event.type == KEYDOWN and event.key in K_DIRECTION:
                 self.intents.direction = K_DIRECTION[event.key]
