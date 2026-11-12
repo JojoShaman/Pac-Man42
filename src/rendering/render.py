@@ -3,6 +3,28 @@ from ..maze.grid import Grid
 from ..direction import Direction
 from ..entities import Player
 
+
+PACMAN: dict[str, Surface] = {}
+PM_ROTATE: dict[Direction, list[Surface]] = {}
+
+def load_sprites() -> None:
+    rotation: list[tuple[Direction, int]] = [
+        (Direction.E, 0),
+        (Direction.N, 90),
+        (Direction.W, 180),
+        (Direction.S, -90)
+    ]
+    PACMAN['closed'] = image.load(
+        "resources/pacman/pacman2.png").convert_alpha()
+    PACMAN['open'] = image.load(
+        "resources/pacman/pacman.png").convert_alpha()
+    PACMAN['half'] = image.load(
+        "resources/pacman/pacman1.png").convert_alpha()
+    PACMAN['closed1'] = image.load(
+    "resources/pacman/pacman2.png").convert_alpha()
+    for _, pacman in PACMAN.items():
+        for d, r in rotation:
+            PM_ROTATE.setdefault(d, []).append(transform.rotate(pacman, r))
 def window_pos(x: float, y: float,
                offset_x: int, offset_y: int,
                cell_size: int) -> tuple[int, int]:
