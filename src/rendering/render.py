@@ -35,6 +35,12 @@ def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
     re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
     screen.blit(pacman, pacman.get_rect(center=re_center)) 
 
+def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]], grid: Grid) -> None:
+    size, off_x, off_y = compute_layout(screen, grid)
+    for x, y in pacgums:
+        p_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
+        draw.circle(screen, 'yellow', p_center, 3)
+
 def window_pos(x: float, y: float,
                offset_x: int, offset_y: int,
                cell_size: int) -> tuple[int, int]:
