@@ -30,6 +30,7 @@ class Playing(State):
         return self
 
     def render(self, screen: Surface):
-        grid: Grid = process_maze(15, 15, 42)
-        maze_surf: Surface = render_maze(screen, grid)
-        screen.blit(maze_surf, (0, 0))
+        if self.m_surf is None:
+            self.m_surf = render_maze(screen, self.game.grid)
+        screen.blit(self.m_surf, (0, 0))
+        draw_pacman(screen, self.game.player, self.game.grid)
