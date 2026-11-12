@@ -1,6 +1,7 @@
 from pygame import *
-from ..maze.grid import Grid, Cell
+from ..maze.grid import Grid
 from ..direction import Direction
+from ..entities import Player
 
 def window_pos(x: float, y: float,
                offset_x: int, offset_y: int,
