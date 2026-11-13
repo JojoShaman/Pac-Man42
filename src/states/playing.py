@@ -21,7 +21,7 @@ class Playing(State):
     def __init__(self, context: Context) -> None:
         self.game: Game = Game(context)
         self.m_surf: Surface | None = None
-        self.intents: Intents = Intents() 
+        self.intents: Intents = Intents()
         self.context: Context = context
 
     def handle_input(self, events: list[Event]) -> None:

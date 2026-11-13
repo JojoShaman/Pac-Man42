@@ -5,7 +5,7 @@ run:
 
 install:
 	@which uv > /dev/null 2>&1 || wget -qO- https://astral.sh/uv/install.sh | sh
-	@uv add mazegenerator-2.1.0-py3-none-any.whl.
+	@uv add mazegenerator-2.1.0-py3-none-any.whl
 	@uv sync
 
 

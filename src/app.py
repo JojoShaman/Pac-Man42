@@ -6,6 +6,7 @@ import pygame
 from pygame.event import Event
 from .context import Context
 
+
 class App:
     def __init__(self, config: Config) -> None:
         self.context: Context = Context(config)
