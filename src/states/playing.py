@@ -1,21 +1,26 @@
 from .state import State
-from pygame import *
 from pygame.event import Event
 from ..rendering.render import render_maze, draw_pacman, draw_pacgums
 from ..game import Game, Intents
 from ..direction import Direction
 from ..context import Context
+from pygame import Surface
+from pygame.locals import (
+    K_UP, K_DOWN, K_LEFT, K_RIGHT,
+    K_w, K_a, K_s, K_d, K_z, K_q, K_n, KEYDOWN
+)
+
+_KEYS: dict[Direction, tuple[int, ...]] = {
+    Direction.N: (K_UP, K_w, K_z),
+    Direction.E: (K_RIGHT, K_d),
+    Direction.S: (K_DOWN, K_s),
+    Direction.W: (K_LEFT, K_a, K_q),
+}
 
 K_DIRECTION: dict[int, Direction] = {
-    K_w: Direction.N,
-    K_d: Direction.E,
-    K_s: Direction.S,
-    K_a: Direction.W,
-    K_UP: Direction.N,
-    K_RIGHT: Direction.E,
-    K_DOWN: Direction.S,
-    K_LEFT: Direction.W
+    key: direction for direction, keys in _KEYS.items() for key in keys
 }
+
 
 class Playing(State):
     def __init__(self, context: Context) -> None:

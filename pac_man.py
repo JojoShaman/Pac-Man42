@@ -3,7 +3,6 @@ if __name__ == "__main__":
     try:
         import sys
         import logging
-        from src.maze.maze_loader import process_maze
         from src.cli import command_line
         from src.config import load_config
         from src.app import App

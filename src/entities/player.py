@@ -1,6 +1,7 @@
 from .entity import Entity
-from ..direction import *
-from ..maze.grid import *
+from ..direction import Direction
+from ..maze.grid import Grid
+
 
 class Player(Entity):
     def __init__(self,

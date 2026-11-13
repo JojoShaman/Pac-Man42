@@ -1,6 +1,7 @@
-from abc import *
+from abc import ABC, abstractmethod
 from pygame import Surface
 from pygame.event import Event
+
 
 class State(ABC):
     @abstractmethod

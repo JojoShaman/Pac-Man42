@@ -1,5 +1,5 @@
-from abc import *
-from ..direction import *
+from abc import ABC, abstractmethod
+from ..direction import Direction
 from ..maze.grid import Grid
 import math
 from typing import Callable
