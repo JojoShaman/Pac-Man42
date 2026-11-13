@@ -39,8 +39,7 @@ class Game:
             print(f"pacgums clamped {count} (number of free cells)")
         return random.sample(candidates, count)
 
-    def _pacgum_candidates(self) -> list[tuple[int, int]]:
-        """Open cells where a pacgum may be placed."""
+    def _pacgum_candidates(self, super: bool) -> list[tuple[int, int]]:
         w, h = self.grid.width, self.grid.height
         excluded = {
             (0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1),

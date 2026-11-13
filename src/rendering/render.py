@@ -1,4 +1,4 @@
-from pygame import *
+from pygame import Surface, image, transform, draw, SRCALPHA, Rect
 from ..maze.grid import Grid
 from ..direction import Direction
 from ..entities import Player
@@ -21,10 +21,11 @@ def load_sprites() -> None:
     PACMAN['half'] = image.load(
         "resources/pacman/pacman1.png").convert_alpha()
     PACMAN['closed1'] = image.load(
-    "resources/pacman/pacman2.png").convert_alpha()
+        "resources/pacman/pacman2.png").convert_alpha()
     for _, pacman in PACMAN.items():
         for d, r in rotation:
             PM_ROTATE.setdefault(d, []).append(transform.rotate(pacman, r))
+
 
 def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
     step = int(player.travelled / 0.25) % 4
@@ -33,13 +34,16 @@ def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
     y = player.y
     size, off_x, off_y = compute_layout(screen, grid)
     re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
-    screen.blit(pacman, pacman.get_rect(center=re_center)) 
+    screen.blit(pacman, pacman.get_rect(center=re_center))
 
-def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]], grid: Grid) -> None:
+
+def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]],
+                 grid: Grid) -> None:
     size, off_x, off_y = compute_layout(screen, grid)
     for x, y in pacgums:
         p_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
         draw.circle(screen, 'yellow', p_center, 3)
+
 
 def window_pos(x: float, y: float,
                offset_x: int, offset_y: int,
@@ -48,15 +52,17 @@ def window_pos(x: float, y: float,
         int(offset_x + x * cell_size),
         int(offset_y + y * cell_size))
 
+
 def compute_layout(screen: Surface, maze: Grid) -> tuple[int, int, int]:
     w, h = screen.get_size()
     gw, gh = maze.width, maze.height
     free_h = h - h // 5
     free_w = w - w // 5
     cell_size = min(free_w // gw, free_h // gh)
-    offset_x = (w - gw * cell_size) // 2 
+    offset_x = (w - gw * cell_size) // 2
     offset_y = (h - gh * cell_size) // 2
     return cell_size, offset_x, offset_y
+
 
 def render_maze(screen: Surface, grid: Grid) -> Surface:
     maze = Surface(screen.get_size(), SRCALPHA)
