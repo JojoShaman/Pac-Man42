@@ -1,11 +1,13 @@
-from pygame import Surface, image, transform, draw, SRCALPHA, Rect
+from pygame import Surface, image, transform, draw, SRCALPHA, Rect, time
 from ..maze.grid import Grid
 from ..direction import Direction
 from ..entities import Player
+import math
 
 
 PACMAN: dict[str, Surface] = {}
 PM_ROTATE: dict[Direction, list[Surface]] = {}
+
 
 def load_sprites() -> None:
     rotation: list[tuple[Direction, int]] = [
@@ -43,6 +45,17 @@ def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]],
     for x, y in pacgums:
         p_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
         draw.circle(screen, 'yellow', p_center, 3)
+
+
+def draw_super_pacgums(screen: Surface, super_pacgums: list[tuple[int, int]],
+                       grid: Grid) -> None:
+    size, off_x, off_y = compute_layout(screen, grid)
+    t = time.get_ticks() / 1000
+    breath = math.sin(t * 3)
+    radius = max(2, int(size * (0.2 + 0.03 * breath)))
+    for x, y in super_pacgums:
+        center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
+        draw.circle(screen, (255, 235, 200), center, radius)   # crème
 
 
 def window_pos(x: float, y: float,

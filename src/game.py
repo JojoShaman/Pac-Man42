@@ -25,6 +25,7 @@ class Game:
             self.grid.width // 2, self.grid.height // 2,
             Direction.S, 4)
         self.pacgums: list[tuple[int, int]] = self.init_pacgums()
+        self.super_pacgums: list[tuple[int, int]] = self.init_super_pacgums()
 
     def get_grid(self) -> Grid:
         return process_maze(
@@ -39,12 +40,17 @@ class Game:
             print(f"pacgums clamped {count} (number of free cells)")
         return random.sample(candidates, count)
 
-    def _pacgum_candidates(self, super: bool) -> list[tuple[int, int]]:
+    def init_super_pacgums(self) -> list[tuple[int, int]]:
+        return self._corners()
+
+    def _corners(self) -> list[tuple[int, int]]:
+        """Return the 4 corner positions of the grid."""
         w, h = self.grid.width, self.grid.height
-        excluded = {
-            (0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1),
-            (self.player.x, self.player.y)
-        }
+        return [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]
+
+    def _pacgum_candidates(self) -> list[tuple[int, int]]:
+        w, h = self.grid.width, self.grid.height
+        excluded = {self._corners, (self.player.x, self.player.y)}
         return [(x, y)
                 for y in range(h) for x in range(w)
                 if self.grid.cells[y][x].walls != 15
@@ -61,6 +67,11 @@ class Game:
         if player_pos in self.pacgums:
             self.score += self.context.config.points_per_pacgum
             self.pacgums.remove((
+                int(player_pos[0]),
+                int(player_pos[1])))
+        elif player_pos in self.super_pacgums:
+            self.score += self.context.config.points_per_super_pacgum
+            self.super_pacgums.remove((
                 int(player_pos[0]),
                 int(player_pos[1])))
 
