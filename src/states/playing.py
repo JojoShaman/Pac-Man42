@@ -1,10 +1,11 @@
 from .state import State
 from pygame.event import Event
-from ..rendering.render import render_maze, draw_pacman, draw_pacgums
+from ..rendering.render import (render_maze, draw_pacman,
+                                draw_pacgums, draw_hud)
 from ..game import Game, Intents
 from ..direction import Direction
 from ..context import Context
-from pygame import Surface
+from pygame import Surface, font
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT,
     K_w, K_a, K_s, K_d, K_z, K_q, K_n, KEYDOWN
@@ -28,6 +29,7 @@ class Playing(State):
         self.m_surf: Surface | None = None
         self.intents: Intents = Intents()
         self.context: Context = context
+        self.font: font.Font = font.Font("Roboto", 15)
 
     def handle_input(self, events: list[Event]) -> None:
         self.intents = Intents()
@@ -50,3 +52,4 @@ class Playing(State):
             screen.blit(self.m_surf, (0, 0))
         draw_pacgums(screen, self.game.pacgums, self.game.grid)
         draw_pacman(screen, self.game.player, self.game.grid)
+        draw_hud(screen, self.game)
