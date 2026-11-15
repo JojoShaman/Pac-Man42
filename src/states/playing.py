@@ -1,7 +1,12 @@
 from .state import State
 from pygame.event import Event
+<<<<<<< HEAD
 from ..rendering.render import (render_maze, draw_pacman,
                                 draw_pacgums, draw_hud)
+=======
+from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
+                                draw_super_pacgums)
+>>>>>>> super_pacgums
 from ..game import Game, Intents
 from ..direction import Direction
 from ..context import Context
@@ -51,5 +56,6 @@ class Playing(State):
         if self.m_surf is not None:
             screen.blit(self.m_surf, (0, 0))
         draw_pacgums(screen, self.game.pacgums, self.game.grid)
+        draw_super_pacgums(screen, self.game.super_pacgums, self.game.grid)
         draw_pacman(screen, self.game.player, self.game.grid)
         draw_hud(screen, self.game)
