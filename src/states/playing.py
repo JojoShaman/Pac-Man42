@@ -7,7 +7,7 @@ from ..direction import Direction
 from ..context import Context
 from pygame import Surface, font
 from pygame.locals import (
-    K_UP, K_DOWN, K_LEFT, K_RIGHT,
+    K_UP, K_DOWN, K_LEFT, K_RIGHT, K_p,
     K_w, K_a, K_s, K_d, K_z, K_q, K_n, KEYDOWN
 )
 
@@ -38,15 +38,17 @@ class Playing(State):
                     self.intents.direction = K_DIRECTION[event.key]
                 elif event.key == K_n:
                     self.intents.next_lvl = True
+                elif event.key == K_p:
+                    self.intents.previous_lvl = True
 
     def update(self, dt):
         self.game.update(dt, self.intents)
         return self
 
     def render(self, screen: Surface, font: font.Font):
-        if self.m_surf is None or self.intents.next_lvl:
-            if self.game.current_lvl <= 9:
-                self.m_surf = render_maze(screen, self.game.grid)
+        if (self.m_surf is None or self.intents.next_lvl
+                or self.intents.previous_lvl):
+            self.m_surf = render_maze(screen, self.game.grid)
         if self.m_surf is not None:
             screen.blit(self.m_surf, (0, 0))
         draw_pacgums(screen, self.game.pacgums, self.game.grid)

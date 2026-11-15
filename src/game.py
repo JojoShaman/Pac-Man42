@@ -11,6 +11,7 @@ class Intents:
     def __init__(self) -> None:
         self.direction: Direction | None = None
         self.next_lvl: bool = False
+        self.previous_lvl: bool = False
 
 
 class Game:
@@ -18,7 +19,9 @@ class Game:
         self.context: Context = context
         self.levels: list[Level] = context.config.levels
         self.current_lvl: int = 0
-        self.seed: int = context.config.seed
+        self.seed: list[int | None] = (
+            [context.config.seed] + [None] * (len(self.levels) - 1)
+        )
         self.grid: Grid = self.get_grid()
         self.score: int = 0
         self.player: Player = Player(
@@ -31,7 +34,14 @@ class Game:
         return process_maze(
             self.levels[self.current_lvl].width,
             self.levels[self.current_lvl].height,
-            self.seed)
+            self.get_seed())
+
+    def get_seed(self) -> int:
+        seed = self.seed[self.current_lvl]
+        if seed is None:
+            seed = random.getrandbits(32)
+            self.seed[self.current_lvl] = seed
+        return seed
 
     def init_pacgums(self) -> list[tuple[int, int]]:
         candidates = self._pacgum_candidates()
@@ -59,12 +69,22 @@ class Game:
     def next_level(self) -> None:
         if self.current_lvl < 9:
             self.current_lvl += 1
-            self.seed = random.getrandbits(32)
-            self.grid = self.get_grid()
+            self.load_level()
+
+    def previous_level(self) -> None:
+        if self.current_lvl > 0:
+            self.current_lvl -= 1
+            self.load_level()
+
+    def load_level(self) -> None:
+        self.grid = self.get_grid()
+        self.pacgums = self.init_pacgums()
+        self.super_pacgums = self.init_super_pacgums()
 
     def increase_score(self) -> None:
         player_pos: tuple[float, float] = (self.player.x, self.player.y)
         if player_pos in self.pacgums:
+            print("yes)")
             self.score += self.context.config.points_per_pacgum
             self.pacgums.remove((
                 int(player_pos[0]),
@@ -78,6 +98,8 @@ class Game:
     def update(self, dt: float, intents: Intents) -> None:
         if intents.next_lvl:
             self.next_level()
+        if intents.previous_lvl:
+            self.previous_level()
         self.player.set_wanted_direction(intents.direction)
         self.player.update(dt, self.grid)
         self.increase_score()

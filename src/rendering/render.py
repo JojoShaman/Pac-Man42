@@ -55,11 +55,11 @@ def draw_hud(screen: Surface, game: Game, font: font.Font) -> None:
         f"Level: {game.current_lvl + 1}"
         # f"Time: {int(game.time_left)}",
     )
-    x = 10
-    for text in texts:
+    col = screen.get_width() // len(texts)
+    for i, text in enumerate(texts):
         surface = font.render(text, True, (255, 255, 255))
-        screen.blit(surface, (x, 8))
-        x += surface.get_width() + 30
+        rect = surface.get_rect(center=(col * i + col // 2, 20))
+        screen.blit(surface, rect)
 
 
 def draw_super_pacgums(screen: Surface, super_pacgums: list[tuple[int, int]],
