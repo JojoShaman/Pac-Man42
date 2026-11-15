@@ -46,6 +46,9 @@ class Game:
     def init_pacgums(self) -> list[tuple[int, int]]:
         candidates = self._pacgum_candidates()
         count = min(self.context.config.pacgums, len(candidates))
+        print(self.context.config.pacgums)
+        print(len(candidates))
+        print(count)
         if count < self.context.config.pacgums:
             print(f"pacgums clamped {count} (number of free cells)")
         return random.sample(candidates, count)
@@ -98,7 +101,7 @@ class Game:
                 int(player_pos[1])))
 
     def update(self, dt: float, intents: Intents) -> None:
-        if intents.next_lvl:
+        if intents.next_lvl or (not self.pacgums and not self.super_pacgums):
             self.next_level()
         if intents.previous_lvl:
             self.previous_level()

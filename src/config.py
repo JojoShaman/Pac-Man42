@@ -132,7 +132,7 @@ VALIDATE: dict[type[Any] | str | Any, Callable] = {
 
 INT_BOUNDS: dict[str, tuple[int, int | None]] = {
     "lives": (1, 5),
-    "pacgums": (10, 1000),
+    "pacgums": (1, 1000),
     "points_per_pacgum": (0, 1000),
     "points_per_super_pacgum": (0, 5000),
     "points_per_ghost": (0, 20000),

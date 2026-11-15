@@ -5,6 +5,7 @@ from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
 from ..game import Game, Intents
 from ..direction import Direction
 from ..context import Context
+from ..maze.grid import Grid
 from pygame import Surface, font
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT, K_p,
@@ -27,6 +28,7 @@ class Playing(State):
     def __init__(self, context: Context) -> None:
         self.game: Game = Game(context)
         self.m_surf: Surface | None = None
+        self.m_grid: Grid | None = None
         self.intents: Intents = Intents()
         self.context: Context = context
 
@@ -46,9 +48,9 @@ class Playing(State):
         return self
 
     def render(self, screen: Surface, font: font.Font):
-        if (self.m_surf is None or self.intents.next_lvl
-                or self.intents.previous_lvl):
+        if (self.m_surf is None or self.m_grid is not self.game.grid):
             self.m_surf = render_maze(screen, self.game.grid)
+            self.m_grid = self.game.grid
         if self.m_surf is not None:
             screen.blit(self.m_surf, (0, 0))
         draw_pacgums(screen, self.game.pacgums, self.game.grid)
