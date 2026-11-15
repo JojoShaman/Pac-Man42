@@ -4,6 +4,7 @@ from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
                                 draw_super_pacgums, draw_hud)
 from ..game import Game, Intents
 from ..direction import Direction
+from typing import Any
 from ..context import Context
 from ..maze.grid import Grid
 from pygame import Surface, font
@@ -43,11 +44,11 @@ class Playing(State):
                 elif event.key == K_p:
                     self.intents.previous_lvl = True
 
-    def update(self, dt):
+    def update(self, dt) -> Any:
         self.game.update(dt, self.intents)
         return self
 
-    def render(self, screen: Surface, font: font.Font):
+    def render(self, screen: Surface, font: font.Font) -> None:
         if (self.m_surf is None or self.m_grid is not self.game.grid):
             self.m_surf = render_maze(screen, self.game.grid)
             self.m_grid = self.game.grid

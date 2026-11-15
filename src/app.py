@@ -1,5 +1,6 @@
 from .states.state import State
 from .states.playing import Playing
+from .states.main_menu import Main_Menu
 from .rendering.render import load_sprites
 from .config import Config
 import pygame
@@ -11,7 +12,7 @@ class App:
     def __init__(self, config: Config) -> None:
         pygame.init()
         self.context: Context = Context(config)
-        self.state: State = Playing(self.context)
+        self.state: State = Main_Menu(self.context)
 
     def run(self) -> None:
 

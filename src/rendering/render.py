@@ -4,10 +4,18 @@ from ..direction import Direction
 from ..entities import Player
 from ..game import Game
 import math
+from functools import lru_cache
+from pygame.font import Font
 
 
 PACMAN: dict[str, Surface] = {}
 PM_ROTATE: dict[Direction, list[Surface]] = {}
+BACKGROUND = (8, 8, 20)
+YELLOW = (255, 221, 0)
+ORANGE = (200, 110, 0)
+WHITE = (235, 235, 240)
+GREY = (125, 125, 140)
+BLUE = (40, 60, 220)
 
 
 def load_sprites() -> None:
@@ -124,3 +132,78 @@ def render_maze(screen: Surface, grid: Grid) -> Surface:
                 background.fill('blue', Rect(left, top, size, size))
     background.blit(maze, (0, 0))
     return background
+
+
+@lru_cache(maxsize=None)
+def get_font(size: int) -> Font:
+    """Return a font of this size, created on first use."""
+    return Font(None, size)
+
+
+def _blit_centered(screen: Surface, text: str, size: int,
+                   color: tuple[int, int, int], center: tuple[int, int]
+                   ) -> None:
+    """Render text and blit it centered on a point."""
+    surface = get_font(size).render(text, True, color)
+    screen.blit(surface, surface.get_rect(center=center))
+
+
+def _draw_title(screen: Surface, t: float) -> None:
+    """Big yellow title with a soft shadow and a gentle float."""
+    w, h = screen.get_size()
+    y = int(h * 0.17 + 5 * math.sin(t * 2))
+    _blit_centered(screen, "PAC-MAN", 120, ORANGE, (w // 2 + 5, y + 6))
+    _blit_centered(screen, "PAC-MAN", 120, YELLOW, (w // 2, y))
+
+
+def _draw_dots(screen: Surface, t: float) -> None:
+    """A row of dots scrolling to the left under the title."""
+    w, h = screen.get_size()
+    y, step = int(h * 0.29), 36
+    shift = (t * 60) % step
+    for i in range(-1, w // step + 2):
+        draw.circle(screen, WHITE, (int(i * step - shift), y), 4)
+
+
+def _draw_option(screen: Surface, text: str, center: tuple[int, int],
+                 selected: bool, t: float) -> None:
+    """One menu line; the selected one gets a frame and a bobbing cursor."""
+    if not selected:
+        _blit_centered(screen, text, 44, GREY, center)
+        return
+    cx, cy = center
+    draw.rect(screen, BLUE, (cx - 230, cy - 28, 460, 56), width=3,
+              border_radius=14)
+    _blit_centered(screen, text, 54, YELLOW, center)
+    x = cx - 190 + int(6 * math.sin(t * 6))        # cursor goes back and forth
+    draw.polygon(screen, YELLOW, [(x, cy - 12), (x + 20, cy), (x, cy + 12)])
+
+
+def _draw_highscores(screen: Surface,
+                     highscores: list[tuple[str, int]]) -> None:
+    """Compact top 5 at the bottom of the screen."""
+    w, h = screen.get_size()
+    top = int(h * 0.73)
+    _blit_centered(screen, "HIGHSCORES", 30, YELLOW, (w // 2, top))
+    if not highscores:
+        _blit_centered(screen, "No score yet", 26, GREY, (w // 2, top + 34))
+        return
+    for i, (name, score) in enumerate(highscores[:5]):
+        line = f"{i + 1}.  {name}  -  {score} pts"
+        _blit_centered(screen, line, 26, WHITE, (w // 2, top + 34 + i * 26))
+
+
+def draw_main_menu(screen: Surface, options: tuple[str, ...], selected: int,
+                   highscores: list[tuple[str, int]]) -> None:
+    """Draw the whole main menu."""
+    w, h = screen.get_size()
+    t = time.get_ticks() / 1000
+    screen.fill(BACKGROUND)
+    _draw_title(screen, t)
+    _draw_dots(screen, t)
+    for i, text in enumerate(options):
+        _draw_option(screen, text, (w // 2, int(h * 0.40) + i * 58),
+                     i == selected, t)
+    _draw_highscores(screen, highscores)
+    _blit_centered(screen, "UP / DOWN to move  -  ENTER to select", 22, GREY,
+                   (w // 2, h - 22))
