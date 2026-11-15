@@ -40,15 +40,11 @@ class Game:
             print(f"pacgums clamped {count} (number of free cells)")
         return random.sample(candidates, count)
 
-<<<<<<< HEAD
-    def _pacgum_candidates(self) -> list[tuple[int, int]]:
-=======
     def init_super_pacgums(self) -> list[tuple[int, int]]:
         return self._corners()
 
     def _corners(self) -> list[tuple[int, int]]:
         """Return the 4 corner positions of the grid."""
->>>>>>> super_pacgums
         w, h = self.grid.width, self.grid.height
         return [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]
 

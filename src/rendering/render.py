@@ -1,16 +1,9 @@
-<<<<<<< HEAD
-from pygame import Surface, image, transform, draw, SRCALPHA, Rect, font
+from pygame import Surface, image, transform, draw, SRCALPHA, Rect, font, time
 from ..maze.grid import Grid
 from ..direction import Direction
 from ..entities import Player
 from ..game import Game
-=======
-from pygame import Surface, image, transform, draw, SRCALPHA, Rect, time
-from ..maze.grid import Grid
-from ..direction import Direction
-from ..entities import Player
 import math
->>>>>>> super_pacgums
 
 
 PACMAN: dict[str, Surface] = {}
@@ -55,7 +48,6 @@ def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]],
         draw.circle(screen, 'yellow', p_center, 3)
 
 
-<<<<<<< HEAD
 def draw_hud(screen: Surface, game: Game, font: font.Font) -> None:
     texts = (
         f"Score: {game.score}",
@@ -68,7 +60,8 @@ def draw_hud(screen: Surface, game: Game, font: font.Font) -> None:
         surface = font.render(text, True, (255, 255, 255))
         screen.blit(surface, (x, 8))
         x += surface.get_width() + 30
-=======
+
+
 def draw_super_pacgums(screen: Surface, super_pacgums: list[tuple[int, int]],
                        grid: Grid) -> None:
     size, off_x, off_y = compute_layout(screen, grid)
@@ -78,7 +71,6 @@ def draw_super_pacgums(screen: Surface, super_pacgums: list[tuple[int, int]],
     for x, y in super_pacgums:
         center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
         draw.circle(screen, (255, 235, 200), center, radius)   # crème
->>>>>>> super_pacgums
 
 
 def window_pos(x: float, y: float,

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from pygame import Surface
+from pygame import Surface, font
 from pygame.event import Event
 
 
@@ -13,5 +13,5 @@ class State(ABC):
         pass
 
     @abstractmethod
-    def render(self, screen: Surface) -> None:
+    def render(self, screen: Surface, font: font.Font) -> None:
         pass

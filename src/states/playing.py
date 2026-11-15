@@ -1,12 +1,7 @@
 from .state import State
 from pygame.event import Event
-<<<<<<< HEAD
-from ..rendering.render import (render_maze, draw_pacman,
-                                draw_pacgums, draw_hud)
-=======
 from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
-                                draw_super_pacgums)
->>>>>>> super_pacgums
+                                draw_super_pacgums, draw_hud)
 from ..game import Game, Intents
 from ..direction import Direction
 from ..context import Context
@@ -34,7 +29,6 @@ class Playing(State):
         self.m_surf: Surface | None = None
         self.intents: Intents = Intents()
         self.context: Context = context
-        self.font: font.Font = font.Font("Roboto", 15)
 
     def handle_input(self, events: list[Event]) -> None:
         self.intents = Intents()
@@ -49,13 +43,13 @@ class Playing(State):
         self.game.update(dt, self.intents)
         return self
 
-    def render(self, screen: Surface):
+    def render(self, screen: Surface, font: font.Font):
         if self.m_surf is None or self.intents.next_lvl:
-            if self.game.current_lvl < 9:
+            if self.game.current_lvl <= 9:
                 self.m_surf = render_maze(screen, self.game.grid)
         if self.m_surf is not None:
             screen.blit(self.m_surf, (0, 0))
         draw_pacgums(screen, self.game.pacgums, self.game.grid)
         draw_super_pacgums(screen, self.game.super_pacgums, self.game.grid)
         draw_pacman(screen, self.game.player, self.game.grid)
-        draw_hud(screen, self.game)
+        draw_hud(screen, self.game, font)

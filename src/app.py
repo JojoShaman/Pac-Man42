@@ -9,11 +9,12 @@ from .context import Context
 
 class App:
     def __init__(self, config: Config) -> None:
+        pygame.init()
         self.context: Context = Context(config)
         self.state: State = Playing(self.context)
 
     def run(self) -> None:
-        pygame.init()
+
         font = pygame.font.Font(None, 24)
         screen = pygame.display.set_mode((1280, 720))
         screen.fill("red")
@@ -28,7 +29,7 @@ class App:
                     running = False
             self.state.handle_input(events)
             self.state.update(dt)
-            self.state.render(screen)
+            self.state.render(screen, font)
             pygame.display.flip()
             dt = clock.tick(60) / 1000
         pygame.quit()
