@@ -80,11 +80,13 @@ class Game:
         self.grid = self.get_grid()
         self.pacgums = self.init_pacgums()
         self.super_pacgums = self.init_super_pacgums()
+        self.player.x = self.grid.width // 2
+        self.player.y = self.grid.height // 2
+        self.player.direction = Direction.S
 
     def increase_score(self) -> None:
         player_pos: tuple[float, float] = (self.player.x, self.player.y)
         if player_pos in self.pacgums:
-            print("yes)")
             self.score += self.context.config.points_per_pacgum
             self.pacgums.remove((
                 int(player_pos[0]),
