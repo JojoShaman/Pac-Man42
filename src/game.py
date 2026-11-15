@@ -46,9 +46,6 @@ class Game:
     def init_pacgums(self) -> list[tuple[int, int]]:
         candidates = self._pacgum_candidates()
         count = min(self.context.config.pacgums, len(candidates))
-        print(self.context.config.pacgums)
-        print(len(candidates))
-        print(count)
         if count < self.context.config.pacgums:
             print(f"pacgums clamped {count} (number of free cells)")
         return random.sample(candidates, count)
