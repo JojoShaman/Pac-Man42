@@ -27,7 +27,7 @@ class Main_Menu(State):
             elif event.key in (K_DOWN, K_s):
                 self.selected = (self.selected + 1) % len(self.OPTIONS)
             elif event.key in (K_RETURN, K_SPACE):
-                self._activate()
+                ...
 
     def update(self, dt: float) -> None:
         pass
