@@ -4,6 +4,7 @@ from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
                                 draw_super_pacgums, draw_hud, draw_start_timer, draw_ghost)
 from ..game import Game, Intents
 from ..direction import Direction
+from typing import Any
 from ..context import Context
 from ..maze.grid import Grid
 import math
