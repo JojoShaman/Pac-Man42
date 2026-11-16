@@ -1,10 +1,11 @@
 from .direction import Direction
-from .entities import Player, Blinky, Pinky, Inky, Ghost
+from .entities import Player, Blinky, Pinky, Inky, Clyde, Ghost, GhostMode, Entity
 from .maze.maze_loader import process_maze
 from .maze.grid import Grid
 from .context import Context
 from .config import Level
 import random
+from typing import Callable
 
 class Intents:
     def __init__(self) -> None:
@@ -12,8 +13,20 @@ class Intents:
         self.next_lvl: bool = False
         self.previous_lvl: bool = False
 
-
 class Game:
+    GHOST_INIT_POS: dict[type[Ghost], tuple[int, int]] = {}
+    GHOST_INIT_DIRECTION: dict[type[Ghost], Direction] = {
+        Blinky: Direction.E,
+        Pinky: Direction.W,
+        Inky: Direction.E,
+        Clyde: Direction.W
+    }
+    GHOST_CLASS: dict[str, type[Ghost]] = {
+        "blinky": Blinky,
+        "pinky": Pinky,
+        "inky": Inky,
+        "clyde": Clyde}
+
     def __init__(self, context: Context) -> None:
         self.context: Context = context
         self.levels: list[Level] = context.config.levels
@@ -26,13 +39,48 @@ class Game:
         self.grid: Grid = self.get_grid()
         self.score: int = 0
         self.player: Player = self.init_player()
-        self.blinky: Blinky = Blinky(0, 0, Direction.E, 3, self.player)
-        self.pinky: Pinky = Pinky(self.grid.width - 1, 0, Direction.W, 3, self.player)
-        self.inky: Inky = Inky(0, self.grid.height - 1, Direction.S, 3, self.player, self.blinky)
+        self.ghosts: dict[str, Ghost] = {}
+        self.init_ghosts()
         self.pacgums: list[tuple[int, int]] = self.init_pacgums()
         self.super_pacgums: list[tuple[int, int]] = self.init_super_pacgums()
         self.seed_random: random.Random = random.Random()
         self.start_timer: float = 3
+
+    def ghost_pos_init(self) -> None:
+        corners: list[tuple[int, int]]= self._corners()
+        for i, (_, ghost) in enumerate(self.GHOST_CLASS.items()):
+            self.GHOST_INIT_POS[ghost] = corners[i]
+
+    def init_ghosts(self) -> None:
+        self.ghost_pos_init()
+        def _init_blinky() -> Blinky:
+            x, y = self.GHOST_INIT_POS[Blinky]
+            direction = self.GHOST_INIT_DIRECTION[Blinky]
+            return Blinky(x, y, direction, 3, self.player)
+
+        def _init_pinky() -> Pinky:
+            x, y = self.GHOST_INIT_POS[Pinky]
+            direction = self.GHOST_INIT_DIRECTION[Pinky]
+            return Pinky(x, y, direction, 3, self.player)
+
+        def _init_inky() -> Inky:
+            x, y = self.GHOST_INIT_POS[Inky]
+            direction = self.GHOST_INIT_DIRECTION[Inky]
+            return Inky(x, y, direction, 3, self.player, self.ghosts["blinky"])
+
+        def _init_clyde() -> Clyde:
+            x, y = self.GHOST_INIT_POS[Clyde]
+            direction = self.GHOST_INIT_DIRECTION[Clyde]
+            return Clyde(x, y, direction, 3, self.player, self.grid)
+
+        g: dict[str, Callable[[], Blinky | Pinky | Inky | Clyde]] = {
+            "blinky": _init_blinky,
+            "pinky": _init_pinky,
+            "inky": _init_inky,
+            "clyde": _init_clyde
+        }
+        for ghost, init in g.items():
+            self.ghosts[ghost] = init()
 
     def get_grid(self) -> Grid:
         return process_maze(
@@ -43,7 +91,7 @@ class Game:
     def get_seed(self) -> int:
         seed = self.seed[self.current_lvl]
         if seed is None:
-            seed = self.seed_random.getrandbits(32) # random from new_instance separated from global generator
+            seed = self.seed_random.getrandbits(32)
             self.seed[self.current_lvl] = seed
         return seed
 
@@ -73,11 +121,6 @@ class Game:
             x = self.grid.width // 2
         return x, y
 
-    def reset_ghost_pos(self) -> None:
-        ghosts: list[Ghost] = [self.blinky, self.pinky, self.inky]
-        for i, (x, y) in enumerate(self._corners()[:3]):
-            ghosts[i].x = x
-            ghosts[i].y = y
 
     def _corners(self) -> list[tuple[int, int]]:
         """Return the 4 corner positions of the grid."""
@@ -88,13 +131,20 @@ class Game:
         w, h = self.grid.width, self.grid.height
         excluded: set[tuple[int, int]] = {
             *self._corners(),
-            (round(self.player.x), round(self.player.y))} # had to call and depile self._corners in order to obtain them and added type hiny
+            (round(self.player.x), round(self.player.y))}
         return [(x, y)
                 for y in range(h) for x in range(w)
                 if self.grid.cells[y][x].walls != 15
                 and (x, y) not in excluded]
 
-
+    def super_gum_activate(self) -> None:
+        for ghost in self.ghosts.values():
+            if ghost.mode == GhostMode.CHASE:
+                ghost.mode = GhostMode.EDIBLE
+                ghost.edible_delay = 30
+                ghost.speed = 2
+                ghost.direction = ghost.direction.opposite
+    
     def increase_score(self) -> None:
         player_pos: tuple[float, float] = (
             self.player.x, self.player.y)
@@ -105,6 +155,7 @@ class Game:
                 int(player_pos[1])))
         elif player_pos in self.super_pacgums:
             self.score += self.context.config.points_per_super_pacgum
+            self.super_gum_activate()
             self.super_pacgums.remove((
                 int(player_pos[0]),
                 int(player_pos[1])))
@@ -124,7 +175,7 @@ class Game:
                 self.next_level()
             elif skips[1]:
                 self.previous_level()
-            self.reset_ghost_pos()
+            self.init_ghosts()
             self.start_timer = 3
         return _wait()
 
@@ -145,12 +196,48 @@ class Game:
         self.set_player_pos()
         self.player.direction = Direction.S
 
+    def collides(self, a: Entity, b: Entity) -> bool:
+        return ((a.x - b.x)**2 + (a.y - b.y)**2) < 0.25**2
+
+    def update_ghosts(self, dt: float) -> None:
+        for ghost in self.ghosts.values():
+            if ghost.mode in (GhostMode.WAITING, GhostMode.EATEN):
+                self.update_waiting_ghost(ghost, dt)
+                if ghost.mode == GhostMode.EATEN:
+                    if ghost.spawn_delay < 5:
+                        ghost.update(dt, self.grid)
+                continue
+            if ghost.mode == GhostMode.EDIBLE:
+                self.update_edible_ghost(ghost, dt)
+            ghost.update(dt, self.grid)
+
+    def update_waiting_ghost(self, ghost: Ghost, dt: float) -> None:
+        if ghost.mode == GhostMode.WAITING:
+            ghost.start_delay -= dt
+            if ghost.start_delay <= 0:
+                ghost.mode = GhostMode.CHASE
+        else:
+            ghost.spawn_delay -= dt
+            if ghost.spawn_delay <= 0:
+                ghost.mode = GhostMode.CHASE
+                ghost.speed = 3
+
+    def update_edible_ghost(self, ghost: Ghost, dt: float) -> None:
+        ghost.edible_delay -= dt
+        if ghost.edible_delay <= 0:
+            ghost.mode = GhostMode.CHASE
+            return
+        if self.collides(self.player, ghost):
+            ghost.mode = GhostMode.EATEN
+            ghost.x, ghost.y = ghost.init_pos
+            ghost.edible_delay = 0
+            ghost.spawn_delay = 7
+            self.score += self.context.config.points_per_ghost
+
     def update(self, dt: float, intents: Intents) -> None:
         dt = self.new_level(intents, dt)
         self.player.set_wanted_direction(intents.direction)
         self.player.update(dt, self.grid)
-        self.blinky.update(dt, self.grid)
-        self.pinky.update(dt, self.grid)
-        self.inky.update(dt, self.grid)
+        self.update_ghosts(dt)
         self.increase_score()
         self.time_left -= dt

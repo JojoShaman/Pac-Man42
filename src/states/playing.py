@@ -57,9 +57,8 @@ class Playing(State):
         draw_pacgums(screen, self.game.pacgums, self.game.grid)
         draw_super_pacgums(screen, self.game.super_pacgums, self.game.grid)
         draw_pacman(screen, self.game.player, self.game.grid)
-        draw_ghost(screen, self.game.blinky, self.game.grid)
-        draw_ghost(screen, self.game.pinky, self.game.grid)
-        draw_ghost(screen, self.game.inky, self.game.grid)
+        for ghost in self.game.ghosts.values():
+            draw_ghost(screen, ghost, self.game.grid)
         if self.game.start_timer:
             draw_start_timer(screen, self.game)
         draw_hud(screen, self.game, font)

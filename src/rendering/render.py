@@ -2,7 +2,7 @@ from pygame import Surface, image, transform, draw, SRCALPHA, Rect, font, time
 from ..maze.grid import Grid
 from ..direction import Direction
 from ..entities import Player
-from ..entities.ghosts import Ghost
+from ..entities.ghosts import Ghost, GhostMode
 from ..game import Game
 import math
 import pygame
@@ -12,6 +12,7 @@ PACMAN: dict[str, Surface] = {}
 PM_ROTATE: dict[Direction, list[Surface]] = {}
 STARTER: dict[int, Surface] = {}
 GHOSTS: dict[str, Surface] = {}
+EDIBLE: list[Surface] = []
 
 
 def load_sprites() -> None:
@@ -22,29 +23,33 @@ def load_sprites() -> None:
         (Direction.S, -90)
     ]
     PACMAN['closed'] = image.load(
-        "resources/pacman/pacman2.png").convert_alpha()
+        "resources/pacman/pacman2.png")
     PACMAN['open'] = image.load(
-        "resources/pacman/pacman.png").convert_alpha()
+        "resources/pacman/pacman.png")
     PACMAN['half'] = image.load(
-        "resources/pacman/pacman1.png").convert_alpha()
+        "resources/pacman/pacman1.png")
     PACMAN['closed1'] = image.load(
-        "resources/pacman/pacman2.png").convert_alpha()
+        "resources/pacman/pacman2.png")
     for _, pacman in PACMAN.items():
         for d, r in rotation:
             PM_ROTATE.setdefault(d, []).append(transform.rotate(pacman, r))
     for i in range(1,4):
         STARTER[i] = image.load(
-            f"resources/starter/{i}_40x40.png").convert_alpha()
+            f"resources/starter/{i}_40x40.png")
     for ghost in ["blinky", "pinky", "inky", "clyde"]:
         GHOSTS[ghost] = image.load(
-            f"resources/ghost_gang/{ghost}.png").convert_alpha()
+            f"resources/ghost_gang/{ghost}.png")
+    for i in range(2):
+        EDIBLE.append(
+            image.load(f"resources/ghost_gang/edible/edible{i}.png"))
 
 
 def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
     step = int(player.travelled / 0.25) % 4
     cell_size, _, _ = compute_layout(screen, grid)
-    size = int(cell_size - cell_size * 0.35) # dynamic size based on the cell cize
-    pacman = transform.scale(PM_ROTATE[player.direction][step], (size, size))
+    size = int(cell_size - cell_size * 0.35)
+    pacman = transform.scale(
+        PM_ROTATE[player.direction][step], (size, size))
     x = player.x
     y = player.y
     size, off_x, off_y = compute_layout(screen, grid)
@@ -53,8 +58,21 @@ def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
 
 def draw_ghost(screen: Surface, ghost: Ghost, grid: Grid) -> None:
     cell_size, _, _ = compute_layout(screen, grid)
-    size = int(cell_size - cell_size * 0.35) # dynamic size based on the cell cize
-    g = transform.scale(GHOSTS[ghost.name], (size - 2, size))
+    size = int(cell_size - cell_size * 0.35)
+    if ghost.mode != GhostMode.EDIBLE:
+        image = GHOSTS[ghost.name].copy()
+        if ghost.mode in (GhostMode.EATEN, GhostMode.WAITING):
+            value = (128, 192)
+            step = (int(ghost.spawn_delay * 4) % 2
+                    if ghost.spawn_delay < 4 else 0)
+            image.set_alpha(value[step])
+    else:
+        step = int(ghost.edible_delay * 4) % 2
+        if ghost.edible_delay < 2:
+            image = EDIBLE[step]
+        else:
+            image = EDIBLE[0]
+    g = transform.scale(image, (size - 2, size))
     x = ghost.x
     y = ghost.y
     size, off_x, off_y = compute_layout(screen, grid)
@@ -65,7 +83,8 @@ def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]],
                  grid: Grid) -> None:
     size, off_x, off_y = compute_layout(screen, grid)
     for x, y in pacgums:
-        p_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
+        p_center = window_pos(
+            x + 0.5, y + 0.5, off_x, off_y, size)
         draw.circle(screen, 'yellow', p_center, 3)
 
 

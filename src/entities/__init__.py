@@ -1,5 +1,6 @@
 from .player import Player
-from .ghosts import Blinky, Pinky, Inky, Clyde, Ghost
+from .ghosts import Blinky, Pinky, Inky, Clyde, Ghost, GhostMode
+from .entity import Entity
 
 all = [
     "Player",
@@ -8,4 +9,6 @@ all = [
     "Pinky",
     "Inky",
     "Clyde",
+    "GhostMode",
+    "Entity"
 ]
