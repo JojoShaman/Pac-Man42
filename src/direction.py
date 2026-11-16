@@ -16,3 +16,7 @@ class Direction(IntFlag):
     def opposite(self) -> "Direction":
         return {Direction.N: Direction.S, Direction.S: Direction.N,
                 Direction.E: Direction.W, Direction.W: Direction.E}[self]
+    @property
+    def priority(self) -> "Direction":
+        return {Direction.N: Direction.W, Direction.W: Direction.S,
+                Direction.S: Direction.E, Direction.E: Direction.N}[self]

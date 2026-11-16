@@ -16,7 +16,7 @@ class App:
     def run(self) -> None:
 
         font = pygame.font.Font(None, 24)
-        screen = pygame.display.set_mode((1280, 720))
+        screen = pygame.display.set_mode((500, 720))
         screen.fill("red")
         load_sprites()
         running = True

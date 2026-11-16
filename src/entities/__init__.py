@@ -1,5 +1,11 @@
 from .player import Player
+from .ghosts import Blinky, Pinky, Inky, Clyde, Ghost
 
 all = [
-    "Player"
+    "Player",
+    "Ghost",
+    "Blinky",
+    "Pinky",
+    "Inky",
+    "Clyde",
 ]

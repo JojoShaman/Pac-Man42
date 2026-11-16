@@ -1,11 +1,12 @@
 from .state import State
 from pygame.event import Event
 from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
-                                draw_super_pacgums, draw_hud)
+                                draw_super_pacgums, draw_hud, draw_start_timer, draw_ghost)
 from ..game import Game, Intents
 from ..direction import Direction
 from ..context import Context
 from ..maze.grid import Grid
+import math
 from pygame import Surface, font
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT, K_p,
@@ -43,11 +44,11 @@ class Playing(State):
                 elif event.key == K_p:
                     self.intents.previous_lvl = True
 
-    def update(self, dt):
+    def update(self, dt) -> State:
         self.game.update(dt, self.intents)
         return self
 
-    def render(self, screen: Surface, font: font.Font):
+    def render(self, screen: Surface, font: font.Font) -> None:
         if (self.m_surf is None or self.m_grid is not self.game.grid):
             self.m_surf = render_maze(screen, self.game.grid)
             self.m_grid = self.game.grid
@@ -56,4 +57,9 @@ class Playing(State):
         draw_pacgums(screen, self.game.pacgums, self.game.grid)
         draw_super_pacgums(screen, self.game.super_pacgums, self.game.grid)
         draw_pacman(screen, self.game.player, self.game.grid)
+        draw_ghost(screen, self.game.blinky, self.game.grid)
+        draw_ghost(screen, self.game.pinky, self.game.grid)
+        draw_ghost(screen, self.game.inky, self.game.grid)
+        if self.game.start_timer:
+            draw_start_timer(screen, self.game)
         draw_hud(screen, self.game, font)
