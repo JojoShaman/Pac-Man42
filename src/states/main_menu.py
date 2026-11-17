@@ -1,8 +1,7 @@
 from .state import State
-# from .playing import Playing
 from ..context import Context
 from pygame.event import Event
-from pygame import Surface, font
+from pygame import Surface
 from ..rendering.render import draw_main_menu
 from pygame.locals import (
     K_UP, K_DOWN, K_RETURN, K_SPACE,
@@ -16,7 +15,7 @@ class Main_Menu(State):
         self.context = context
         self.selected = 0
         self.menu_surface: Surface | None = None
-        self.highscores: list[tuple[str, int]] = [("test", 100), ("Thomas", 1200)]
+        # self.highscores: list[tuple[str, int]] = [("test", 100), ("Thomas", 1200)]
         self.state: State | None = self
 
     def handle_input(self, events: list[Event]) -> None:
@@ -44,5 +43,5 @@ class Main_Menu(State):
         return next_state
 
     def render(self) -> None:
-        draw_main_menu(self.context.screen, self.OPTIONS, self.selected, self.highscores)
+        draw_main_menu(self.context.screen, self.OPTIONS, self.selected, self.context.highscores)
 

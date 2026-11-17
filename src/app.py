@@ -5,6 +5,7 @@ from .config import Config
 import pygame
 from pygame.event import Event
 from .context import Context
+from .highscore import load_highscore, get_highscore_path
 
 
 class App:
@@ -12,7 +13,10 @@ class App:
         pygame.init()
         self.font = pygame.font.Font(None, 24)
         self.screen = pygame.display.set_mode((500, 720))
-        self.context: Context = Context(config, self.font, self.screen, None)
+        self.context: Context = Context(
+            config, self.font, self.screen, None,
+            get_highscore_path(config.highscore_filename), [])
+        load_highscore(self.context)
         self.state: State | None = Main_Menu(self.context)
 
     def run(self) -> None:

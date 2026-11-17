@@ -1,4 +1,4 @@
-from pygame import Surface, image, transform, draw, SRCALPHA, Rect, font, time
+from pygame import Surface, image, transform, draw, SRCALPHA, Rect, font, time, Color, BLEND_RGB_MAX, BLEND_RGB_MULT
 from ..maze.grid import Grid
 from ..direction import Direction
 from ..entities import Player
@@ -7,7 +7,7 @@ from ..game import Game
 import math
 from functools import lru_cache
 from pygame.font import Font
-
+from typing import Any
 
 PACMAN: dict[str, Surface] = {}
 PM_ROTATE: dict[Direction, list[Surface]] = {}
@@ -33,13 +33,13 @@ def load_sprites() -> None:
         (Direction.S, -90)
     ]
     PACMAN['closed'] = image.load(
-        "resources/pacman/pacman2.png")
+        "resources/pacman/pacman2.png").convert_alpha()
     PACMAN['open'] = image.load(
-        "resources/pacman/pacman.png")
+        "resources/pacman/pacman0.png").convert_alpha()
     PACMAN['half'] = image.load(
-        "resources/pacman/pacman1.png")
+        "resources/pacman/pacman1.png").convert_alpha()
     PACMAN['closed1'] = image.load(
-        "resources/pacman/pacman2.png")
+        "resources/pacman/pacman2.png").convert_alpha()
     for _, pacman in PACMAN.items():
         for d, r in rotation:
             PM_ROTATE.setdefault(d, []).append(transform.rotate(pacman, r))
@@ -93,15 +93,20 @@ def draw_end(
     screen.blit(text, text.get_rect(center=bar.center))
 
 def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
-    step = int(player.travelled / 0.25) % 4
-    cell_size, _, _ = compute_layout(screen, grid)
+    step = int(player.travelled / 0.5) % 4
+    cell_size, off_x, off_y = compute_layout(screen, grid)
     size = int(cell_size - cell_size * 0.35)
     pacman = transform.scale(
         PM_ROTATE[player.direction][step], (size, size))
+    if player.immortal:
+        hue = (time.get_ticks() / 1000 * 180) % 360
+        color = Color(0, 0, 0)
+        color.hsva = (hue, 100, 100, 100)
+        pacman.fill((255, 255, 255), special_flags=BLEND_RGB_MAX)
+        pacman.fill(color, special_flags=BLEND_RGB_MULT)
     x = player.x
     y = player.y
-    size, off_x, off_y = compute_layout(screen, grid)
-    re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
+    re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, cell_size)
     screen.blit(pacman, pacman.get_rect(center=re_center))
 
 def draw_ghost(screen: Surface, ghost: Ghost, grid: Grid) -> None:
@@ -236,7 +241,6 @@ def get_font(size: int) -> Font:
     """Return a font of this size, created on first use."""
     return Font(None, size)
 
-
 def _blit_centered(screen: Surface, text: str, size: int,
                    color: tuple[int, int, int], center: tuple[int, int]
                    ) -> None:
@@ -289,7 +293,7 @@ def _draw_option(screen: Surface, text: str, center: tuple[int, int],
 
 
 def _draw_highscores(screen: Surface,
-                     highscores: list[tuple[str, int]]) -> None:
+                     highscores: list[dict[str, Any]]) -> None:
     """Compact top 5 at the bottom of the screen."""
     w, h = screen.get_size()
     top = int(h * 0.73)
@@ -297,13 +301,15 @@ def _draw_highscores(screen: Surface,
     if not highscores:
         _blit_centered(screen, "No score yet", 26, GREY, (w // 2, top + 34))
         return
-    for i, (name, score) in enumerate(highscores[:5]):
+    for i, player in enumerate(highscores[:5]):
+        name = player['name']
+        score = player['score']
         line = f"{i + 1}.  {name}  -  {score} pts"
         _blit_centered(screen, line, 26, WHITE, (w // 2, top + 34 + i * 26))
 
 
 def draw_main_menu(screen: Surface, options: tuple[str, ...], selected: int,
-                   highscores: list[tuple[str, int]]) -> None:
+                   highscores: list[dict[str, Any]]) -> None:
     """Draw the whole main menu."""
     w, h = screen.get_size()
     t = time.get_ticks() / 1000

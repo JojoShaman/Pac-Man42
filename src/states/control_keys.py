@@ -15,7 +15,13 @@ KEYS: dict[str, str] = {
     "RIGHT": "arrow right  d",
     "Next Level": "N",
     "Previous Level": "P",
-    "Pause": "L"}
+    "Pause": "L",
+    "Add 1 life": "+",
+    "Remove - life": "-",
+    "Immortality": "1",
+    "Super speed": "2",
+    "Freeze ghosts": "3"
+    }
 
 class Keys(State):
     def __init__(self, context: Context, last_state: Instructions) -> None:

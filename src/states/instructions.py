@@ -1,8 +1,7 @@
 from .state import State
-from .pause import PauseMenu
 from ..context import Context
 from pygame.event import Event
-from pygame import Surface, font
+from pygame import Surface
 from ..rendering.render import draw_pause_menu, blur
 from pygame.locals import (
     K_UP, K_DOWN, K_RETURN, K_SPACE, K_ESCAPE,

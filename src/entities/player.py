@@ -10,6 +10,7 @@ class Player(Entity):
                  speed: int) -> None:
         super().__init__(x, y, direction, speed)
         self.buffer_input: Direction = direction
+        self.immortal: bool = False
 
     def choose_direction(self, grid: Grid) -> Direction:
         cell = grid.cells[int(self.y)][int(self.x)]

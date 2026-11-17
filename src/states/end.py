@@ -5,7 +5,7 @@ from pygame.event import Event
 from ..game import Game
 from pygame import Surface
 from pygame.locals import (
-    K_RETURN, K_BACKSPACE, K_SPACE, KEYDOWN,
+    K_RETURN, K_BACKSPACE, KEYDOWN,
 )
 from ..rendering.render import draw_end, render_maze
 class End(State):
@@ -25,11 +25,16 @@ class End(State):
                 continue
             if event.key == K_BACKSPACE:
                 self.name = self.name[:-1]
-            elif event.key in (K_RETURN, K_SPACE):
+            elif event.key == K_RETURN:
+                from ..highscore import new_score, load_highscore
+                new_score(self.context, {"name": self.name, "score": self.game.score})
+                load_highscore(self.context)
                 self.state =  Main_Menu(self.context)
             elif event.unicode:
                 char: str = event.unicode
-                self.name += char if char.isascii() else ""
+                if len(self.name) < 10:
+                    if char.isalpha() or char == " ":
+                        self.name += char
 
     def update(self, dt: float) -> "State | None":
         self.elapsed += dt

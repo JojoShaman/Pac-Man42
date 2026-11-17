@@ -9,7 +9,7 @@ from ..maze.grid import Grid
 from pygame import Surface, font
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT, K_p,
-    K_w, K_a, K_s, K_d, K_z, K_q, K_n, K_l, KEYDOWN
+    K_w, K_a, K_s, K_d, K_z, K_q, K_n, K_l, K_f, KEYDOWN
 )
 from .end import End
 
@@ -47,11 +47,22 @@ class Playing(State):
                     self.intents.previous_lvl = True
                 elif event.key == K_l:
                     self.pause = True
+                elif event.unicode == "+":
+                    self.game.lives += 1
+                elif event.unicode == "-":
+                    self.game.lives -= 1
+                elif event.unicode == "1":
+                    self.game.player.immortal = self.game.player.immortal == False
+                elif event.unicode == "2":
+                    speed = self.game.player.speed
+                    self.game.player.speed = 6 if speed == 4 else 4
+                elif event.unicode == "3":
+                    self.intents.freeze = self.intents.freeze == False
 
     def update(self, dt) -> State | None:
         self.game.update(dt, self.intents)
         self.context.last_state = self
-        if self.game.lives == 0:
+        if self.game.lives == 0 or self.game.time_left <= 0:
             return End(self.context, self.game, False)
         elif self.game.current_lvl == 9 and len(self.game.pacgums) == 0:
             return End(self.context, self.game, True)

@@ -12,6 +12,7 @@ class Intents:
         self.direction: Direction | None = None
         self.next_lvl: bool = False
         self.previous_lvl: bool = False
+        self.freeze: bool = False
 
 class Game:
     GHOST_INIT_POS: dict[type[Ghost], tuple[int, int]] = {}
@@ -46,6 +47,7 @@ class Game:
         self.seed_random: random.Random = random.Random()
         self.start_timer: float = 3
         self.restart_level: bool = False
+        self.freeze_ghosts: bool = False
 
     def ghost_pos_init(self) -> None:
         corners: list[tuple[int, int]]= self._corners()
@@ -142,7 +144,7 @@ class Game:
         for ghost in self.ghosts.values():
             if ghost.mode == GhostMode.CHASE:
                 ghost.mode = GhostMode.EDIBLE
-                ghost.edible_delay = 30
+                ghost.edible_delay = 7
                 ghost.speed = 2
                 ghost.direction = ghost.direction.opposite
     
@@ -199,6 +201,7 @@ class Game:
         self.pacgums = self.init_pacgums()
         self.super_pacgums = self.init_super_pacgums()
         self.set_player_pos()
+        self.time_left = self.context.config.level_max_time
         self.player.direction = Direction.S
         self.player.buffer_input = Direction.S
 
@@ -210,12 +213,13 @@ class Game:
             if ghost.mode in (GhostMode.WAITING, GhostMode.EATEN):
                 self.update_waiting_ghost(ghost, dt)
                 if ghost.mode == GhostMode.EATEN:
-                    if ghost.spawn_delay < 5:
+                    if ghost.spawn_delay < 5 and not self.freeze_ghosts:
                         ghost.update(dt, self.grid)
                 continue
             if ghost.mode == GhostMode.EDIBLE:
                 self.update_edible_ghost(ghost, dt)
-            ghost.update(dt, self.grid)
+            if not self.freeze_ghosts:
+                ghost.update(dt, self.grid)
 
     def update_waiting_ghost(self, ghost: Ghost, dt: float) -> None:
         if ghost.mode == GhostMode.WAITING:
@@ -241,9 +245,11 @@ class Game:
             self.score += self.context.config.points_per_ghost
 
     def update(self, dt: float, intents: Intents) -> None:
+        if intents.freeze:
+            self.freeze_ghosts = self.freeze_ghosts == False
         for g in self.ghosts.values():
             if g.mode == GhostMode.CHASE:
-                if self.collides(self.player, g):
+                if self.collides(self.player, g) and not self.player.immortal:
                     self.lives -= 1
                     self.restart_level = True
         dt = self.new_level(intents, dt)
