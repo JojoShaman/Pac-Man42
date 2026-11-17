@@ -1,7 +1,4 @@
-from .state import State
-from .playing import Playing
-from .pause import PauseMenu
-from .instructions import Instructions
+from .state import State, StateName
 from ..context import Context
 from pygame.event import Event
 from pygame import Surface, font
@@ -19,12 +16,13 @@ KEYS: dict[str, str] = {
     "Previous Level": "P",
     "Pause": "L"}
 
+
 class Keys(State):
-    def __init__(self, context: Context, last_state: Instructions, screen: Surface) -> None:
+    def __init__(self, context: Context,
+                 screen: Surface) -> None:
         self.context = context
         self.selected = 0
-        self.instructions = last_state
-        self.state: State | None = self
+        self.state: StateName | None = StateName.SETTINGS
         self.backdrop: Surface = blur(screen)
 
     def handle_input(self, events: list[Event]) -> None:
@@ -32,9 +30,9 @@ class Keys(State):
             if event.type != KEYDOWN:
                 continue
             if event.key == K_ESCAPE:
-                self.state = self.instructions
+                self.state = StateName.SETTINGS
 
-    def update(self, dt: float) -> State | None:
+    def update(self, dt: float) -> StateName | None:
         return self.state
 
     def render(self, screen: Surface, font: font.Font) -> None:

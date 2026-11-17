@@ -55,10 +55,11 @@ def load_sprites() -> None:
     END["game_over"] = image.load(f"resources/end_game/GameOver.png")
     END["you_win"] = image.load(f"resources/end_game/YouWon.png")
 
+
 def draw_end(
         screen: Surface,
         maze_surf: Surface,
-        game: Game,
+        score: int,
         win: bool,
         fade: float,
         name: str,
@@ -79,8 +80,9 @@ def draw_end(
 
     center_y = h // 2
 
-    score = font.render(f"SCORE  {game.score}", True, TEXT_COLOR)
-    screen.blit(score, score.get_rect(center=(w // 2, center_y - 60)))
+    score_font = font.render(f"SCORE  {score}", True, TEXT_COLOR)
+    screen.blit(score_font,
+                score_font.get_rect(center=(w // 2, center_y - 60)))
 
     label = font.render("ENTER YOUR NAME", True, TEXT_COLOR)
     screen.blit(label, label.get_rect(center=(w // 2, center_y - 20)))
@@ -91,6 +93,7 @@ def draw_end(
 
     text = font.render(name, True, TEXT_COLOR)
     screen.blit(text, text.get_rect(center=bar.center))
+
 
 def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
     step = int(player.travelled / 0.25) % 4
@@ -103,6 +106,7 @@ def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
     size, off_x, off_y = compute_layout(screen, grid)
     re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
     screen.blit(pacman, pacman.get_rect(center=re_center))
+
 
 def draw_ghost(screen: Surface, ghost: Ghost, grid: Grid) -> None:
     cell_size, _, _ = compute_layout(screen, grid)
@@ -127,6 +131,7 @@ def draw_ghost(screen: Surface, ghost: Ghost, grid: Grid) -> None:
     re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
     screen.blit(g, g.get_rect(center=re_center))
 
+
 def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]],
                  grid: Grid) -> None:
     size, off_x, off_y = compute_layout(screen, grid)
@@ -149,6 +154,7 @@ def draw_start_timer(screen: Surface, game: Game) -> None:
     center_y = off_y + gr_h // 2
     resize = transform.scale(s, (size, size))
     screen.blit(resize, resize.get_rect(center=(center_x, center_y)))
+
 
 def draw_hud(screen: Surface, game: Game, font: font.Font) -> None:
     texts = (

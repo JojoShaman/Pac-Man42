@@ -1,6 +1,9 @@
-from .states.state import State
-from .states.control_keys import Keys
-from .states.main_menu import Main_Menu
+from .states.state import State, StateName
+# from .states.control_keys import Keys
+from .states.main_menu import MainMenu
+from .states.playing import Playing
+from .states.end import End
+# from .states.pause import PauseMenu
 from .rendering.render import load_sprites
 from .config import Config
 import pygame
@@ -12,7 +15,18 @@ class App:
     def __init__(self, config: Config) -> None:
         pygame.init()
         self.context: Context = Context(config)
-        self.state: State | None = Main_Menu(self.context)
+        self.state: State = MainMenu(self.context)
+
+    def _build_state(self, name: StateName) -> State:
+        if name is StateName.PLAYING:
+            return Playing(self.context)
+        elif name is StateName.SETTINGS:
+            ...
+        elif name is StateName.GAME_OVER:
+            if self.context.result is None:
+                return MainMenu(self.context)
+            return End(self.context, self.context.result)
+        return MainMenu(self.context)
 
     def run(self) -> None:
         font_size = 12
@@ -28,13 +42,13 @@ class App:
             for event in events:
                 if event.type == pygame.QUIT:
                     running = False
-            if self.state:
-                self.state.handle_input(events)
-                self.state = self.state.update(dt)
-                if self.state:
-                    self.state.render(screen, font)
-                else:
-                    break
+            self.state.handle_input(events)
+            requested = self.state.update(dt)
+            if requested is StateName.QUIT:
+                running = False
+            elif requested is not None:
+                self.state = self._build_state(requested)
+            self.state.render(screen, font)
             pygame.display.flip()
-            dt = clock.tick(60) / 1000
+            dt = min(clock.tick(60) / 1000, 0.05)
         pygame.quit()
