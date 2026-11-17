@@ -4,15 +4,14 @@ from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
                                 draw_super_pacgums, draw_hud, draw_start_timer, draw_ghost)
 from ..game import Game, Intents
 from ..direction import Direction
-from typing import Any
 from ..context import Context
 from ..maze.grid import Grid
-import math
 from pygame import Surface, font
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT, K_p,
-    K_w, K_a, K_s, K_d, K_z, K_q, K_n, KEYDOWN
+    K_w, K_a, K_s, K_d, K_z, K_q, K_n, K_l, KEYDOWN
 )
+from .end import End
 
 _KEYS: dict[Direction, tuple[int, ...]] = {
     Direction.N: (K_UP, K_w, K_z),
@@ -33,6 +32,8 @@ class Playing(State):
         self.m_grid: Grid | None = None
         self.intents: Intents = Intents()
         self.context: Context = context
+        self.pause: bool = False
+        self.state: State = self
 
     def handle_input(self, events: list[Event]) -> None:
         self.intents = Intents()
@@ -44,9 +45,20 @@ class Playing(State):
                     self.intents.next_lvl = True
                 elif event.key == K_p:
                     self.intents.previous_lvl = True
+                elif event.key == K_l:
+                    self.pause = True
 
-    def update(self, dt) -> State:
+    def update(self, dt) -> State | None:
         self.game.update(dt, self.intents)
+        if self.game.lives == 0:
+            return End(self.context, self.game, False)
+        elif self.game.current_lvl == 9 and len(self.game.pacgums) == 0:
+            return End(self.context, self.game, True)
+        if self.pause:
+            from .pause import PauseMenu
+            self.pause = False
+            if self.m_surf:
+                return PauseMenu(self.context, self, self.m_surf)
         return self
 
     def render(self, screen: Surface, font: font.Font) -> None:

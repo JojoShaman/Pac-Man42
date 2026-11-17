@@ -45,6 +45,7 @@ class Game:
         self.super_pacgums: list[tuple[int, int]] = self.init_super_pacgums()
         self.seed_random: random.Random = random.Random()
         self.start_timer: float = 3
+        self.restart_level: bool = False
 
     def ghost_pos_init(self) -> None:
         corners: list[tuple[int, int]]= self._corners()
@@ -170,7 +171,9 @@ class Game:
             intent.next_lvl, intent.previous_lvl,
             len(self.pacgums) == False
             ]
-        if any(skips):
+        if any(skips) or self.restart_level:
+            if self.restart_level:
+                self.restart_lvl()
             if skips[0] or skips[2]:
                 self.next_level()
             elif skips[1]:
@@ -188,6 +191,10 @@ class Game:
         if self.current_lvl > 0:
             self.current_lvl -= 1
             self.load_level()
+
+    def restart_lvl(self) -> None:
+        self.restart_level = False
+        self.load_level()
 
     def load_level(self) -> None:
         self.grid = self.get_grid()
@@ -235,6 +242,11 @@ class Game:
             self.score += self.context.config.points_per_ghost
 
     def update(self, dt: float, intents: Intents) -> None:
+        for g in self.ghosts.values():
+            if g.mode == GhostMode.CHASE:
+                if self.collides(self.player, g):
+                    self.lives -= 1
+                    self.restart_level = True
         dt = self.new_level(intents, dt)
         self.player.set_wanted_direction(intents.direction)
         self.player.update(dt, self.grid)
