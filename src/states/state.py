@@ -13,5 +13,5 @@ class State(ABC):
         pass
 
     @abstractmethod
-    def render(self, screen: Surface, font: font.Font) -> None:
+    def render(self) -> None:
         pass

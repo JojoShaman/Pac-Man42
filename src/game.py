@@ -179,22 +179,20 @@ class Game:
             elif skips[1]:
                 self.previous_level()
             self.init_ghosts()
+            self.load_level()
             self.start_timer = 3
         return _wait()
 
     def next_level(self) -> None:
         if self.current_lvl < 9:
             self.current_lvl += 1
-            self.load_level()
 
     def previous_level(self) -> None:
         if self.current_lvl > 0:
             self.current_lvl -= 1
-            self.load_level()
 
     def restart_lvl(self) -> None:
         self.restart_level = False
-        self.load_level()
 
     def load_level(self) -> None:
         self.grid = self.get_grid()
@@ -202,6 +200,7 @@ class Game:
         self.super_pacgums = self.init_super_pacgums()
         self.set_player_pos()
         self.player.direction = Direction.S
+        self.player.buffer_input = Direction.S
 
     def collides(self, a: Entity, b: Entity) -> bool:
         return ((a.x - b.x)**2 + (a.y - b.y)**2) < 0.25**2

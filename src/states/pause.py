@@ -7,18 +7,16 @@ from pygame import Surface, font
 from ..rendering.render import draw_pause_menu, blur
 from pygame.locals import (
     K_UP, K_DOWN, K_RETURN, K_SPACE,
-    K_w, K_s, K_z, KEYDOWN
+    K_w, K_s, K_z, K_l, KEYDOWN
 )
 
 PAUSE_OPTIONS = ("Resume", "Instructions", "Main Menu")
 class PauseMenu(State):
-    def __init__(self, context: Context, playing: Playing, screen: Surface) -> None:
+    def __init__(self, context: Context) -> None:
         self.context = context
         self.selected = 0
-        self.screen = screen
         self.state: State | None = self
-        self.playing: Playing = playing
-        self.backdrop: Surface = blur(screen)
+        self.backdrop: Surface = blur(self.context.screen)
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
@@ -28,12 +26,15 @@ class PauseMenu(State):
                 self.selected = (self.selected - 1) % len(PAUSE_OPTIONS)
             elif event.key in (K_DOWN, K_s):
                 self.selected = (self.selected + 1) % len(PAUSE_OPTIONS)
+            elif event.key == K_l:
+                self.state = self.context.last_state
             elif event.key in (K_RETURN, K_SPACE):
                 if PAUSE_OPTIONS[self.selected] == "Resume":
-                    self.state = self.playing
+                    self.state = self.context.last_state
                 if PAUSE_OPTIONS[self.selected] == "Instructions":
                     from .instructions import Instructions
-                    self.state = Instructions(self.context, self, self.screen)
+                    self.context.last_state = self
+                    self.state = Instructions(self.context)
                 if PAUSE_OPTIONS[self.selected] == "Main Menu":
                     self.state = Main_Menu(self.context)
 
@@ -41,5 +42,5 @@ class PauseMenu(State):
         next_state, self.state = self.state, self
         return next_state
 
-    def render(self, screen: Surface, font: font.Font) -> None:
-        draw_pause_menu(screen, self.backdrop, PAUSE_OPTIONS, self.selected)
+    def render(self) -> None:
+        draw_pause_menu(self.context.screen, self.backdrop, PAUSE_OPTIONS, self.selected, "PAUSE")

@@ -30,13 +30,19 @@ class Main_Menu(State):
                 self.selected = (self.selected + 1) % len(self.OPTIONS)
             elif event.key in (K_RETURN, K_SPACE):
                 if self.OPTIONS[self.selected] == "Start Game":
+                    self.context.last_state = self
                     self.state =  Playing(self.context)
+                if self.OPTIONS[self.selected] == "Instructions":
+                    self.context.last_state = self
+                    from .instructions import Instructions
+                    self.state = Instructions(self.context)
                 if self.OPTIONS[self.selected] == "Exit":
                     self.state = None
 
     def update(self, dt: float) -> State | None:
-        return self.state
+        next_state, self.state = self.state, self
+        return next_state
 
-    def render(self, screen: Surface, font: font.Font) -> None:
-        draw_main_menu(screen, self.OPTIONS, self.selected, self.highscores)
+    def render(self) -> None:
+        draw_main_menu(self.context.screen, self.OPTIONS, self.selected, self.highscores)
 

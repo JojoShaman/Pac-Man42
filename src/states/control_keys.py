@@ -1,6 +1,4 @@
 from .state import State
-from .playing import Playing
-from .pause import PauseMenu
 from .instructions import Instructions
 from ..context import Context
 from pygame.event import Event
@@ -20,12 +18,12 @@ KEYS: dict[str, str] = {
     "Pause": "L"}
 
 class Keys(State):
-    def __init__(self, context: Context, last_state: Instructions, screen: Surface) -> None:
+    def __init__(self, context: Context, last_state: Instructions) -> None:
         self.context = context
         self.selected = 0
         self.instructions = last_state
         self.state: State | None = self
-        self.backdrop: Surface = blur(screen)
+        self.backdrop: Surface = blur(self.context.screen)
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
@@ -37,5 +35,5 @@ class Keys(State):
     def update(self, dt: float) -> State | None:
         return self.state
 
-    def render(self, screen: Surface, font: font.Font) -> None:
-        draw_controls_menu(screen, self.backdrop, KEYS, self.selected)
+    def render(self) -> None:
+        draw_controls_menu(self.context.screen, self.backdrop, KEYS)

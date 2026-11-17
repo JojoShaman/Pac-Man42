@@ -3,7 +3,7 @@ from .main_menu import Main_Menu
 from ..context import Context
 from pygame.event import Event
 from ..game import Game
-from pygame import Surface, font
+from pygame import Surface
 from pygame.locals import (
     K_RETURN, K_BACKSPACE, K_SPACE, KEYDOWN,
 )
@@ -35,8 +35,11 @@ class End(State):
         self.elapsed += dt
         return self.state
 
-    def render(self, screen: Surface, font: font.Font) -> None:
+    def render(self) -> None:
         if self.maze_surf is None:
-            self.maze_surf = render_maze(screen, self.game.grid)
+            self.maze_surf = render_maze(
+                self.context.screen, self.game.grid)
         fade = self.elapsed / 2.5
-        draw_end(screen, self.maze_surf, self.game, self.win, fade, self.name, font)
+        draw_end(self.context.screen, self.maze_surf,
+                 self.game, self.win, fade, self.name,
+                 self.context.font)

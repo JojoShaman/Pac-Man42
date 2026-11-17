@@ -327,7 +327,8 @@ def blur(surface: Surface, factor: int = 20) -> Surface:
 
 
 def draw_pause_menu(screen: Surface, backdrop: Surface,
-                    options: tuple[str, ...], selected: int) -> None:
+                    options: tuple[str, ...], selected: int, 
+                    interface: str) -> None:
     """Draw a small pause window over the blurred, dimmed game."""
     PANEL_W = 420
     FRAME_W = PANEL_W - 60
@@ -344,14 +345,13 @@ def draw_pause_menu(screen: Surface, backdrop: Surface,
     draw.rect(screen, BACKGROUND, panel, border_radius=18)
     draw.rect(screen, BLUE, panel, width=3, border_radius=18)
 
-    _blit_centered(screen, "PAUSED", 64, YELLOW, (w // 2, panel.top + 50))
+    _blit_centered(screen, interface, 64, YELLOW, (w // 2, panel.top + 50))
     for i, text in enumerate(options):
         _draw_option(screen, text, (w // 2, panel.top + 120 + i * 58),
                      i == selected, t, FRAME_W)
 
 def draw_controls_menu(screen: Surface, backdrop: Surface,
-                    options: dict[str, str], selected: int) -> None:
-    """Draw a small pause window over the blurred, dimmed game."""
+                    options: dict[str, str]) -> None:
     PANEL_W = 420
     w, h = screen.get_size()
     screen.blit(backdrop, (0, 0))
@@ -371,3 +371,23 @@ def draw_controls_menu(screen: Surface, backdrop: Surface,
         midright = (panel.right - 30, panel.top + 120 + i * 58)
         _blit_left(screen, key, 34, YELLOW, midleft)
         _blit_right(screen, value, 34, YELLOW, midright)
+
+def draw_rules_menu(screen: Surface, backdrop: Surface,
+                    options: list[str]) -> None:
+    PANEL_W = 420
+    w, h = screen.get_size()
+    screen.blit(backdrop, (0, 0))
+
+    veil = Surface((w, h), SRCALPHA)
+    veil.fill((0, 0, 0, 5))
+    screen.blit(veil, (0, 0))
+
+    panel = Rect(0, 0, PANEL_W, 140 + len(options) * 58)
+    panel.center = (w // 2, h // 2)
+    draw.rect(screen, BACKGROUND, panel, border_radius=18)
+    draw.rect(screen, BLUE, panel, width=3, border_radius=18)
+
+    _blit_centered(screen, "RULES", 64, YELLOW, (w // 2, panel.top + 50))
+    for i, rule in enumerate(options):
+        midleft = (panel.left + 30, panel.top + 120 + i * 30)
+        _blit_left(screen, rule, 24, YELLOW, midleft)

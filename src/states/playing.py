@@ -50,6 +50,7 @@ class Playing(State):
 
     def update(self, dt) -> State | None:
         self.game.update(dt, self.intents)
+        self.context.last_state = self
         if self.game.lives == 0:
             return End(self.context, self.game, False)
         elif self.game.current_lvl == 9 and len(self.game.pacgums) == 0:
@@ -58,20 +59,20 @@ class Playing(State):
             from .pause import PauseMenu
             self.pause = False
             if self.m_surf:
-                return PauseMenu(self.context, self, self.m_surf)
+                return PauseMenu(self.context)
         return self
 
-    def render(self, screen: Surface, font: font.Font) -> None:
+    def render(self) -> None:
         if (self.m_surf is None or self.m_grid is not self.game.grid):
-            self.m_surf = render_maze(screen, self.game.grid)
+            self.m_surf = render_maze(self.context.screen, self.game.grid)
             self.m_grid = self.game.grid
         if self.m_surf is not None:
-            screen.blit(self.m_surf, (0, 0))
-        draw_pacgums(screen, self.game.pacgums, self.game.grid)
-        draw_super_pacgums(screen, self.game.super_pacgums, self.game.grid)
-        draw_pacman(screen, self.game.player, self.game.grid)
+            self.context.screen.blit(self.m_surf, (0, 0))
+        draw_pacgums(self.context.screen, self.game.pacgums, self.game.grid)
+        draw_super_pacgums(self.context.screen, self.game.super_pacgums, self.game.grid)
+        draw_pacman(self.context.screen, self.game.player, self.game.grid)
         for ghost in self.game.ghosts.values():
-            draw_ghost(screen, ghost, self.game.grid)
+            draw_ghost(self.context.screen, ghost, self.game.grid)
         if self.game.start_timer:
-            draw_start_timer(screen, self.game)
-        draw_hud(screen, self.game, font)
+            draw_start_timer(self.context.screen, self.game)
+        draw_hud(self.context.screen, self.game, self.context.font)

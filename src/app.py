@@ -1,5 +1,4 @@
 from .states.state import State
-from .states.control_keys import Keys
 from .states.main_menu import Main_Menu
 from .rendering.render import load_sprites
 from .config import Config
@@ -11,14 +10,12 @@ from .context import Context
 class App:
     def __init__(self, config: Config) -> None:
         pygame.init()
-        self.context: Context = Context(config)
+        self.font = pygame.font.Font(None, 24)
+        self.screen = pygame.display.set_mode((500, 720))
+        self.context: Context = Context(config, self.font, self.screen, None)
         self.state: State | None = Main_Menu(self.context)
 
     def run(self) -> None:
-        font_size = 12
-        font = pygame.font.Font(None, font_size)
-        screen = pygame.display.set_mode((500, 720))
-        screen.fill("red")
         load_sprites()
         running = True
         clock = pygame.time.Clock()
@@ -32,7 +29,7 @@ class App:
                 self.state.handle_input(events)
                 self.state = self.state.update(dt)
                 if self.state:
-                    self.state.render(screen, font)
+                    self.state.render()
                 else:
                     break
             pygame.display.flip()
