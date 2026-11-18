@@ -15,7 +15,9 @@ from .context import Context
 class App:
     def __init__(self, config: Config) -> None:
         pygame.init()
-        self.context: Context = Context(config)
+        self.font = pygame.font.Font(None, 24)
+        self.screen = pygame.display.set_mode((500, 720))
+        self.context: Context = Context(config, self.font, self.screen, None)
         self.states: list[State] = [MainMenu(self.context)]
 
     def current(self) -> State:

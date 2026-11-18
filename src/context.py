@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from .config import Config
 from .maze.grid import Grid
+import pygame
 
 
 @dataclass
@@ -13,4 +14,6 @@ class GameResult:
 @dataclass
 class Context:
     config: Config
+    screen: pygame.Surface
+    font: pygame.font.Font
     result: GameResult | None = None
