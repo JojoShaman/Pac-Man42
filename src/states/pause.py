@@ -1,13 +1,15 @@
-from .state import State, StateName
-from ..context import Context
 from pygame.event import Event
-from ..rendering.user_interface import draw_pause_menu
 from pygame.locals import (
-    K_UP, K_DOWN, K_RETURN, K_SPACE, K_ESCAPE,
-    K_w, K_s, K_z, KEYDOWN
+    K_DOWN, K_ESCAPE, K_RETURN, K_SPACE, K_UP, KEYDOWN, K_s, K_w, K_z,
 )
 
+from ..context import Context
+from ..rendering.user_interface import draw_pause_menu
+from .state import State, StateName
+
+
 class PauseMenu(State):
+    """Resume, open the instructions or go back to the main menu."""
 
     OPTIONS: tuple[tuple[str, StateName], ...] = (
         ("Resume", StateName.BACK),
@@ -16,11 +18,13 @@ class PauseMenu(State):
     )
 
     def __init__(self, context: Context) -> None:
+        """Select the first option."""
         self.context = context
         self.selected = 0
         self.state: StateName | None = None
 
     def handle_input(self, events: list[Event]) -> None:
+        """Move the selection; Escape resumes the game."""
         for event in events:
             if event.type != KEYDOWN:
                 continue
@@ -34,9 +38,11 @@ class PauseMenu(State):
                 self.state = StateName.BACK
 
     def update(self, dt: float) -> StateName | None:
+        """Return the pending request once, then clear it."""
         next_state, self.state = self.state, None
         return next_state
 
     def render(self) -> None:
+        """Draw the pause menu over the blurred game."""
         labels = tuple(label for label, _ in self.OPTIONS)
         draw_pause_menu(self.context, labels, self.selected, "PAUSE")

@@ -1,12 +1,15 @@
-from .entity import Entity
-from .player import Player
-from ..direction import Direction, priority
-from ..maze.grid import Grid
 from enum import Enum
 from abc import abstractmethod
-import random
+
+from ..direction import Direction, priority
+from ..maze.grid import Grid
+from .entity import Entity
+from .player import Player
+
 
 class GhostMode(Enum):
+    """Behaviour mode of a ghost."""
+
     WAITING = 1
     CHASE = 2
     EDIBLE = 3
@@ -14,12 +17,15 @@ class GhostMode(Enum):
 
 
 class Ghost(Entity):
+    """Base ghost: greedy movement towards a target (away if edible)."""
+
     def __init__(self,
                  x: float,
                  y: float,
                  direction: Direction,
                  speed: int,
                  player: Player) -> None:
+        """Create a waiting ghost; its corner is kept in init_pos."""
         self.player: Player = player
         self.name: str = ""
         self.mode: GhostMode = GhostMode.WAITING
@@ -31,9 +37,15 @@ class Ghost(Entity):
 
     @abstractmethod
     def get_target(self) -> tuple[float, float]:
+        """Return the cell this ghost aims for in chase mode."""
         return 0, 0
 
-    def choose_direction(self, grid) -> Direction:
+    def choose_direction(self, grid: Grid) -> Direction:
+        """Pick the free direction closest to the target (no U-turn).
+
+        Ties follow priority() (up, left, down, right). In edible mode the
+        farthest one is chosen. A dead end allows the U-turn.
+        """
         tx, ty = self.get_target()
         direction: Direction = self.direction
         candidates: list[Direction] = []
@@ -41,7 +53,7 @@ class Ghost(Entity):
         current = grid.cells[int(self.y)][int(self.x)]
         for d in priority():
             if (current.has_wall(d) or
-                d == self.direction.opposite):
+                    d == self.direction.opposite):
                 continue
             candidates.append(d)
         if candidates:
@@ -58,42 +70,61 @@ class Ghost(Entity):
             direction = self.direction.opposite
         return direction
 
+
 class Blinky(Ghost):
-    def __init__(self, x, y, direction, speed, player) -> None:
+    """Red ghost: targets the player directly."""
+
+    def __init__(self, x: float, y: float, direction: Direction,
+                 speed: int, player: Player) -> None:
+        """Create Blinky (leaves immediately)."""
         super().__init__(x, y, direction, speed, player)
         self.name = "blinky"
         self.start_delay = 0
 
-
     def chase(self) -> tuple[float, float]:
+        """Target the player's position."""
         return self.player.x, self.player.y
 
-    def get_target(self):
+    def get_target(self) -> tuple[float, float]:
+        """Return the chase target."""
         return self.chase()
 
+
 class Pinky(Ghost):
-    def __init__(self, x, y, direction, speed, player) -> None:
+    """Pink ghost: targets 4 cells ahead of the player."""
+
+    def __init__(self, x: float, y: float, direction: Direction,
+                 speed: int, player: Player) -> None:
+        """Create Pinky (leaves after 3 s)."""
         super().__init__(x, y, direction, speed, player)
         self.name = "pinky"
         self.start_delay = 3
 
     def chase(self) -> tuple[float, float]:
+        """Target 4 cells in front of the player."""
         off_x, off_y = self.player.direction.offset
         target_x = self.player.x + 4 * off_x
         target_y = self.player.y + 4 * off_y
         return target_x, target_y
 
-    def get_target(self):
+    def get_target(self) -> tuple[float, float]:
+        """Return the chase target."""
         return self.chase()
 
+
 class Inky(Ghost):
-    def __init__(self, x, y, direction, speed, player, blinky) -> None:
+    """Cyan ghost: target mirrored from Blinky around a pivot ahead."""
+
+    def __init__(self, x: float, y: float, direction: Direction,
+                 speed: int, player: Player, blinky: Blinky) -> None:
+        """Create Inky (leaves after 7 s)."""
         super().__init__(x, y, direction, speed, player)
         self.blinky: Blinky = blinky
         self.name = "inky"
         self.start_delay = 7
 
     def chase(self) -> tuple[float, float]:
+        """Double the vector from Blinky to 2 cells ahead of the player."""
         off_x, off_y = self.player.direction.offset
         pivot_x = self.player.x + 2 * off_x
         pivot_y = self.player.y + 2 * off_y
@@ -103,12 +134,19 @@ class Inky(Ghost):
         target_y = pivot_y + (pivot_y - by)
         return target_x, target_y
 
-    def get_target(self):
+    def get_target(self) -> tuple[float, float]:
+        """Return the chase target."""
         return self.chase()
 
+
 class Clyde(Ghost):
+    """Orange ghost: chases from afar, retreats to its corner when close."""
+
     FLEE_RATIO = 8 / 28
-    def __init__(self, x, y, direction, speed, player, grid) -> None:
+
+    def __init__(self, x: float, y: float, direction: Direction,
+                 speed: int, player: Player, grid: Grid) -> None:
+        """Create Clyde (leaves after 12 s); flee distance scales with grid."""
         super().__init__(x, y, direction, speed, player)
         self.grid: Grid = grid
         self.min_size: int = min(self.grid.width, self.grid.height)
@@ -117,10 +155,12 @@ class Clyde(Ghost):
         self.start_delay = 12
 
     def chase(self) -> tuple[float, float]:
-            _dist = (self.x - self.player.x)**2 + (self.y - self.player.y)**2
-            if _dist < self.flee_threshold_sq:
-                return self.init_pos
-            return self.player.x, self.player.y
-    
-    def get_target(self):
+        """Target the player, or the home corner when too close."""
+        _dist = (self.x - self.player.x)**2 + (self.y - self.player.y)**2
+        if _dist < self.flee_threshold_sq:
+            return self.init_pos
+        return self.player.x, self.player.y
+
+    def get_target(self) -> tuple[float, float]:
+        """Return the chase target."""
         return self.chase()

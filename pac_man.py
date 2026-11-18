@@ -7,7 +7,7 @@ if __name__ == "__main__":
         from src.config import load_config
         from src.app import App
         logging.basicConfig(
-            level=logging.INFO, 
+            level=logging.INFO,
             format="%(levelname)s: %(message)s")
         config_content = command_line()
         config = load_config(config_content)

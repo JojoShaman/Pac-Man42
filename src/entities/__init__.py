@@ -8,7 +8,7 @@ from .ghosts import (
     GhostMode)
 from .entity import Entity
 
-all = [
+__all__ = [
     "Player",
     "Ghost",
     "Blinky",

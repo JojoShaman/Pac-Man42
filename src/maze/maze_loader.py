@@ -1,15 +1,18 @@
 from mazegenerator import MazeGenerator
+
 from .grid import Cell, Grid
 
 MIN_SIZE, MAX_SIZE = 10, 50
 
 
 class MazeError(Exception):
+    """Raised when the maze cannot be generated or is invalid."""
+
     ...
 
 
 def process_maze(width: int, height: int, seed: int) -> Grid:
-    """Process the maze from the MazeGenerator """
+    """Generate a maze and return it as a validated Grid."""
     try:
         seed = max(1, seed)
         gen = MazeGenerator(size=(width, height), perfect=False, seed=seed)

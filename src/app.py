@@ -1,27 +1,33 @@
-from .states import (
-    State,
-    StateName,
-    MainMenu,
-    Playing,
-    End,
-    PauseMenu,
-    Rules,
-    Keys,
-    Instructions
-)
-from .rendering.user_interface import blur
-from .rendering.sprites import load_sprites
-from .config import Config
 import pygame
 from pygame.event import Event
+
+from .config import Config
 from .context import Context, GameResult
-from .highscore import load_highscore, get_highscore_path
+from .highscore import get_highscore_path, load_highscore
+from .rendering.sprites import load_sprites
+from .rendering.user_interface import blur
+from .states import (
+    End,
+    Instructions,
+    Keys,
+    MainMenu,
+    PauseMenu,
+    Playing,
+    Rules,
+    State,
+    StateName,
+)
 
 STATES: dict[StateName, State] = {}
 OVERLAYS = {StateName.PAUSE, StateName.INSTRUCTIONS,
             StateName.RULES, StateName.CONTROL_KEYS}
+
+
 class App:
+    """Owns the window, the shared context and the stack of states."""
+
     def __init__(self, config: Config) -> None:
+        """Init pygame, the shared context, the highscores and the states."""
         pygame.init()
         self.font = pygame.font.Font(None, 24)
         self.screen = pygame.display.set_mode((500, 720))
@@ -34,6 +40,7 @@ class App:
         self.init_states()
 
     def init_states(self) -> None:
+        """Create one instance of every screen."""
         STATES[StateName.PLAYING] = Playing(self.context)
         STATES[StateName.PAUSE] = PauseMenu(self.context)
         STATES[StateName.INSTRUCTIONS] = Instructions(self.context)
@@ -43,9 +50,11 @@ class App:
         STATES[StateName.MENU] = MainMenu(self.context)
 
     def new_game(self) -> None:
+        """Replace the game screen with a fresh one."""
         STATES[StateName.PLAYING] = Playing(self.context)
 
     def _apply(self, requested: StateName) -> bool:
+        """Apply a transition; return False when the app must quit."""
         if requested is StateName.QUIT:
             return False
         if requested is StateName.BACK:
@@ -62,6 +71,7 @@ class App:
         return True
 
     def run(self) -> None:
+        """Run the main loop: input, update, render, transition."""
         load_sprites()
         running = True
         clock = pygame.time.Clock()

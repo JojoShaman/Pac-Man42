@@ -1,17 +1,20 @@
-from .state import State, StateName
-from ..context import Context
-from pygame.event import Event
-from pygame import Surface
-from pygame.locals import (
-    K_RETURN, K_BACKSPACE, KEYDOWN,
-)
-from ..rendering.user_interface import draw_end
-from ..highscore import new_score, load_highscore
 import re
+
+from pygame import Surface
+from pygame.event import Event
+from pygame.locals import K_BACKSPACE, K_RETURN, KEYDOWN
+
+from ..context import Context
+from ..highscore import load_highscore, new_score
+from ..rendering.user_interface import draw_end
+from .state import State, StateName
 
 
 class End(State):
+    """Asks the player's name and saves the score."""
+
     def __init__(self, context: Context) -> None:
+        """Start with an empty name and a fade timer at zero."""
         self.context = context
         self.state: StateName | None = None
         self.name: str = ""
@@ -19,6 +22,7 @@ class End(State):
         self.elapsed: float = 0.0
 
     def handle_input(self, events: list[Event]) -> None:
+        """Type the name (max 10 alnum); Enter saves it and quits to menu."""
         for event in events:
             if event.type != KEYDOWN:
                 continue
@@ -37,10 +41,12 @@ class End(State):
                         self.name += char
 
     def update(self, dt: float) -> StateName | None:
+        """Advance the fade; return the pending request once."""
         self.elapsed += dt
         next_state, self.state = self.state, None
         return next_state
 
     def render(self) -> None:
+        """Draw the end screen with a 0.5 s fade-in."""
         fade = self.elapsed / 0.5
         draw_end(self.context, fade, self.name, self.context.font)

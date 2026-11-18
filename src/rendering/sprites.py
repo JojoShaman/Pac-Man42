@@ -1,13 +1,15 @@
-from ..direction import Direction
-from pygame import (
-    Surface, image, transform, draw, Color, time,
-    BLEND_RGB_MAX, BLEND_RGB_MULT)
-from ..entities import Player, Ghost, GhostMode
-from ..maze.grid import Grid
-from ..game import Game
-from .render import compute_layout, window_pos
 import math
 
+from pygame import (
+    BLEND_RGB_MAX, BLEND_RGB_MULT, Color, Surface,
+    draw, image, time, transform,
+)
+
+from ..direction import Direction
+from ..entities import Ghost, GhostMode, Player
+from ..game import Game
+from ..maze.grid import Grid
+from .render import compute_layout, window_pos
 
 PACMAN: dict[str, Surface] = {}
 PM_ROTATE: dict[Direction, list[Surface]] = {}
@@ -16,7 +18,9 @@ GHOSTS: dict[str, Surface] = {}
 EDIBLE: list[Surface] = []
 END: dict[str, Surface] = {}
 
+
 def load_sprites() -> None:
+    """Load every image once (pygame must be initialised)."""
     rotation: list[tuple[Direction, int]] = [
         (Direction.E, 0),
         (Direction.N, 90),
@@ -34,7 +38,7 @@ def load_sprites() -> None:
     for _, pacman in PACMAN.items():
         for d, r in rotation:
             PM_ROTATE.setdefault(d, []).append(transform.rotate(pacman, r))
-    for i in range(1,4):
+    for i in range(1, 4):
         STARTER[i] = image.load(
             f"resources/starter/{i}_40x40.png")
     for ghost in ["blinky", "pinky", "inky", "clyde"]:
@@ -43,10 +47,12 @@ def load_sprites() -> None:
     for i in range(2):
         EDIBLE.append(
             image.load(f"resources/ghost_gang/edible/edible{i}.png"))
-    END["game_over"] = image.load(f"resources/end_game/GameOver.png")
-    END["you_win"] = image.load(f"resources/end_game/YouWon.png")
+    END["game_over"] = image.load("resources/end_game/GameOver.png")
+    END["you_win"] = image.load("resources/end_game/YouWon.png")
+
 
 def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
+    """Draw Pac-Man (animated mouth, rainbow when immortal)."""
     step = int(player.travelled / 0.5) % 4
     cell_size, off_x, off_y = compute_layout(screen, grid)
     size = int(cell_size - cell_size * 0.35)
@@ -63,7 +69,9 @@ def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
     re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, cell_size)
     screen.blit(pacman, pacman.get_rect(center=re_center))
 
+
 def draw_ghost(screen: Surface, ghost: Ghost, grid: Grid) -> None:
+    """Draw a ghost according to its mode (translucent, edible, normal)."""
     cell_size, _, _ = compute_layout(screen, grid)
     size = int(cell_size - cell_size * 0.35)
     if ghost.mode != GhostMode.EDIBLE:
@@ -86,16 +94,21 @@ def draw_ghost(screen: Surface, ghost: Ghost, grid: Grid) -> None:
     re_center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
     screen.blit(g, g.get_rect(center=re_center))
 
+
 def draw_pacgums(screen: Surface, pacgums: list[tuple[int, int]],
                  grid: Grid) -> None:
+    """Draw the pacgums as small yellow dots."""
     size, off_x, off_y = compute_layout(screen, grid)
     for x, y in pacgums:
         p_center = window_pos(
             x + 0.5, y + 0.5, off_x, off_y, size)
         draw.circle(screen, 'yellow', p_center, size * 0.1)
 
-def draw_super_pacgums(screen: Surface, super_pacgums: list[tuple[int, int]],
-                       grid: Grid) -> None:
+
+def draw_super_pacgums(
+        screen: Surface, super_pacgums: list[tuple[int, int]],
+        grid: Grid) -> None:
+    """Draw the super-pacgums as slowly pulsing discs."""
     size, off_x, off_y = compute_layout(screen, grid)
     t = time.get_ticks() / 1000
     breath = math.sin(t * 3)
@@ -104,12 +117,14 @@ def draw_super_pacgums(screen: Surface, super_pacgums: list[tuple[int, int]],
         center = window_pos(x + 0.5, y + 0.5, off_x, off_y, size)
         draw.circle(screen, (255, 235, 200), center, radius)
 
+
 def draw_start_timer(screen: Surface, game: Game) -> None:
+    """Draw the 3-2-1 countdown at the centre of the maze."""
     step = math.ceil(game.start_timer)
     s = STARTER.get(step)
     if s is None:
         return
-    cell_size, off_x, off_y = compute_layout(screen,  game.grid)
+    cell_size, off_x, off_y = compute_layout(screen, game.grid)
     gr_w = game.grid.width * cell_size
     gr_h = game.grid.height * cell_size
     size = gr_w - gr_w * 0.7

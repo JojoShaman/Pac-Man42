@@ -1,41 +1,50 @@
-from pygame import (
-    Surface, transform, draw, Rect, font, time, SRCALPHA)
-from .colors import (BACKGROUND, YELLOW, ORANGE, WHITE, GREY, BLUE)
-from .sprites import END
-from ..context import Context
-from functools import lru_cache
-from pygame.font import Font
-from typing import Any
 import math
+from functools import lru_cache
+from typing import Any
 
+from pygame import SRCALPHA, Rect, Surface, draw, font, time, transform
+from pygame.font import Font
+
+from ..context import Context
+from .colors import BACKGROUND, BLUE, GREY, ORANGE, WHITE, YELLOW
+from .sprites import END
 
 INPUT_BAR_SIZE = (260, 44)
 TEXT_COLOR = "white"
 
+
 @lru_cache(maxsize=None)
 def get_font(size: int) -> Font:
+    """Return a cached default font of the given size."""
     return Font(None, size)
+
 
 def _blit_centered(screen: Surface, text: str, size: int,
                    color: tuple[int, int, int], center: tuple[int, int]
                    ) -> None:
+    """Draw text centered on a point."""
     surface = get_font(size).render(text, True, color)
     screen.blit(surface, surface.get_rect(center=center))
 
+
 def _blit_left(screen: Surface, text: str, size: int,
-                   color: tuple[int, int, int], midleft: tuple[int, int]
-                   ) -> None:
+               color: tuple[int, int, int], midleft: tuple[int, int]
+               ) -> None:
+    """Draw text anchored on its left-middle point."""
     surface = get_font(size).render(text, True, color)
     screen.blit(surface, surface.get_rect(midleft=midleft))
 
+
 def _blit_right(screen: Surface, text: str, size: int,
-                   color: tuple[int, int, int], midright: tuple[int, int]
-                   ) -> None:
+                color: tuple[int, int, int], midright: tuple[int, int]
+                ) -> None:
+    """Draw text anchored on its right-middle point."""
     surface = get_font(size).render(text, True, color)
     screen.blit(surface, surface.get_rect(midright=midright))
 
 
 def _draw_title(screen: Surface, t: float) -> None:
+    """Draw the floating "PAC-MAN" title with a shadow."""
     w, h = screen.get_size()
     y = int(h * 0.17 + 5 * math.sin(t * 2))
     _blit_centered(screen, "PAC-MAN", 120, ORANGE, (w // 2 + 5, y + 6))
@@ -43,6 +52,7 @@ def _draw_title(screen: Surface, t: float) -> None:
 
 
 def _draw_dots(screen: Surface, t: float) -> None:
+    """Draw a row of scrolling dots under the title."""
     w, h = screen.get_size()
     y, step = int(h * 0.29), 36
     shift = (t * 60) % step
@@ -52,6 +62,7 @@ def _draw_dots(screen: Surface, t: float) -> None:
 
 def _draw_option(screen: Surface, text: str, center: tuple[int, int],
                  selected: bool, t: float, frame_w: int = 460) -> None:
+    """Draw a menu entry; the selected one gets a frame and a cursor."""
     if not selected:
         _blit_centered(screen, text, 44, GREY, center)
         return
@@ -66,6 +77,7 @@ def _draw_option(screen: Surface, text: str, center: tuple[int, int],
 
 def _draw_highscores(screen: Surface,
                      highscores: list[dict[str, Any]]) -> None:
+    """Draw the top 10 (or "No score yet") in the main menu."""
     w, h = screen.get_size()
     top = int(h * 0.63)
     _blit_centered(screen, "HIGHSCORES", 30, YELLOW, (w // 2, top))
@@ -81,6 +93,7 @@ def _draw_highscores(screen: Surface,
 
 def draw_main_menu(screen: Surface, options: tuple[str, ...], selected: int,
                    highscores: list[dict[str, Any]]) -> None:
+    """Draw the whole main menu."""
     w, h = screen.get_size()
     t = time.get_ticks() / 1000
     screen.fill(BACKGROUND)
@@ -93,9 +106,9 @@ def draw_main_menu(screen: Surface, options: tuple[str, ...], selected: int,
     _blit_centered(screen, "UP / DOWN to move  -  ENTER to select", 22, GREY,
                    (w // 2, h - 22))
 
+
 def blur(surface: Surface, factor: int = 12) -> Surface:
     """Return a blurred copy: shrink then enlarge with smoothing."""
-
     w, h = surface.get_size()
     small = transform.smoothscale(surface,
                                   (max(1, w // factor), max(1, h // factor)))
@@ -103,8 +116,9 @@ def blur(surface: Surface, factor: int = 12) -> Surface:
 
 
 def draw_pause_menu(context: Context,
-                    options: tuple[str, ...], selected: int, 
+                    options: tuple[str, ...], selected: int,
                     interface: str) -> None:
+    """Draw a titled menu panel over the backdrop."""
     s = context.screen
     b = context.backdrop
     PANEL_W = 420
@@ -127,7 +141,9 @@ def draw_pause_menu(context: Context,
         _draw_option(s, text, (w // 2, panel.top + 120 + i * 58),
                      i == selected, t, FRAME_W)
 
+
 def draw_controls_menu(context: Context, options: dict[str, str]) -> None:
+    """Draw the keys panel (action on the left, keys on the right)."""
     s = context.screen
     b = context.backdrop
     PANEL_W = 420
@@ -150,8 +166,10 @@ def draw_controls_menu(context: Context, options: dict[str, str]) -> None:
         _blit_left(s, key, 24, YELLOW, midleft)
         _blit_right(s, value, 24, YELLOW, midright)
 
+
 def draw_rules_menu(context: Context,
                     options: list[str]) -> None:
+    """Draw the rules panel."""
     s = context.screen
     b = context.backdrop
     PANEL_W = 420
@@ -172,8 +190,10 @@ def draw_rules_menu(context: Context,
         midleft = (panel.left + 30, panel.top + 120 + i * 30)
         _blit_left(s, rule, 24, YELLOW, midleft)
 
+
 def draw_end(context: Context, fade: float,
              name: str, font: font.Font) -> None:
+    """Draw the end screen: fading title, then score and name input."""
     s = context.screen
     b = context.backdrop
     score = context.result.score
@@ -185,7 +205,8 @@ def draw_end(context: Context, fade: float,
     veil = Surface((w, h), SRCALPHA)
     veil.fill((0, 0, 0, int(255 * fade)))
     s.blit(veil, (0, 0))
-    title = transform.scale(END["you_win" if win else "game_over"], (400, 100))
+    title = transform.scale(
+        END["you_win" if win else "game_over"], (400, 100))
     s.blit(title, title.get_rect(center=(w // 2, h // 4)))
 
     if fade < 1.0:
@@ -194,7 +215,7 @@ def draw_end(context: Context, fade: float,
 
     score_font = font.render(f"SCORE  {score}", True, TEXT_COLOR)
     s.blit(score_font,
-                score_font.get_rect(center=(w // 2, center_y - 60)))
+           score_font.get_rect(center=(w // 2, center_y - 60)))
 
     label = font.render("ENTER YOUR NAME", True, TEXT_COLOR)
     s.blit(label, label.get_rect(center=(w // 2, center_y - 20)))

@@ -1,10 +1,9 @@
-from .state import StateName, State
-from ..context import Context
 from pygame.event import Event
+from pygame.locals import K_ESCAPE, KEYDOWN
+
+from ..context import Context
 from ..rendering.user_interface import draw_rules_menu
-from pygame.locals import (
-    K_ESCAPE, KEYDOWN
-)
+from .state import State, StateName
 
 RULES: list[str] = [
     "• Eat every pac-gum to clear the level.",
@@ -18,13 +17,18 @@ RULES: list[str] = [
     "• Clear all 10 levels to win.",
 ]
 
+
 class Rules(State):
+    """Displays the rules of the game."""
+
     def __init__(self, context: Context) -> None:
+        """Keep the shared context."""
         self.context = context
         self.selected = 0
         self.state: StateName | None = None
 
     def handle_input(self, events: list[Event]) -> None:
+        """Escape goes back."""
         for event in events:
             if event.type != KEYDOWN:
                 continue
@@ -32,8 +36,10 @@ class Rules(State):
                 self.state = StateName.BACK
 
     def update(self, dt: float) -> StateName | None:
+        """Return the pending request once, then clear it."""
         next_state, self.state = self.state, None
         return next_state
 
     def render(self) -> None:
+        """Draw the rules."""
         draw_rules_menu(self.context, RULES)

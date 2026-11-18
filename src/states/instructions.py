@@ -1,22 +1,26 @@
-from .state import State, StateName
-from ..context import Context
 from pygame.event import Event
-from ..rendering.user_interface import draw_pause_menu
 from pygame.locals import (
-    K_UP, K_DOWN, K_RETURN, K_SPACE, K_ESCAPE,
-    K_w, K_s, K_z, KEYDOWN
+    K_DOWN, K_ESCAPE, K_RETURN, K_SPACE, K_UP, KEYDOWN, K_s, K_w, K_z,
 )
+
+from ..context import Context
+from ..rendering.user_interface import draw_pause_menu
+from .state import State, StateName
 
 INSTRUCTIONS = ("Control keys", "Rules")
 
 
 class Instructions(State):
+    """Choose between the control keys and the rules."""
+
     def __init__(self, context: Context) -> None:
+        """Select the first entry."""
         self.context = context
         self.selected = 0
         self.state: StateName | None = None
 
     def handle_input(self, events: list[Event]) -> None:
+        """Move the selection; Escape goes back."""
         for event in events:
             if event.type != KEYDOWN:
                 continue
@@ -33,8 +37,11 @@ class Instructions(State):
                 self.state = StateName.BACK
 
     def update(self, dt: float) -> StateName | None:
+        """Return the pending request once, then clear it."""
         next_state, self.state = self.state, None
         return next_state
 
     def render(self) -> None:
-        draw_pause_menu(self.context, INSTRUCTIONS, self.selected, "INSTRUCTIONS")
+        """Draw the instructions menu."""
+        draw_pause_menu(
+            self.context, INSTRUCTIONS, self.selected, "INSTRUCTIONS")

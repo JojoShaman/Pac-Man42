@@ -1,18 +1,20 @@
-from .state import State, StateName
-from .main_menu import MainMenu
-from .playing import Playing
-from .end import End
-from .pause import PauseMenu
-from .rules import Rules
 from .control_keys import Keys
+from .end import End
 from .instructions import Instructions
+from .main_menu import MainMenu
+from .pause import PauseMenu
+from .playing import Playing
+from .rules import Rules
+from .state import State, StateName
 
-all = [
-    "State"
-    "StateName"
-    "Playing"
-    "End"
-    "PauseMenu"
-    "Keys"
-    "Instructions"
+__all__ = [
+    "End",
+    "Instructions",
+    "Keys",
+    "MainMenu",
+    "PauseMenu",
+    "Playing",
+    "Rules",
+    "State",
+    "StateName",
 ]

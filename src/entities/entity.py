@@ -1,16 +1,20 @@
+import math
 from abc import ABC, abstractmethod
+from typing import Callable
+
 from ..direction import Direction
 from ..maze.grid import Grid
-import math
-from typing import Callable
 
 
 class Entity(ABC):
+    """A moving entity with continuous coordinates (in cells)."""
+
     def __init__(
             self,
             x: float, y: float,
             direction: Direction,
             speed: float) -> None:
+        """Place the entity; speed is in cells per second."""
         self.x = x
         self.y = y
         self.direction: Direction = direction
@@ -19,9 +23,11 @@ class Entity(ABC):
 
     @abstractmethod
     def choose_direction(self, grid: Grid) -> Direction:
+        """Return the direction to take at a cell centre."""
         ...
 
     def update(self, dt: float, grid: Grid) -> None:
+        """Move by speed * dt, snapping to a cell centre when crossing it."""
         distance = self.speed * dt
         dx, dy = self.direction.offset
         rnd: Callable[[float], int] = (

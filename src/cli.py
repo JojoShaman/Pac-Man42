@@ -1,9 +1,11 @@
-from argparse import Namespace, ArgumentParser
+from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
 
 def command_line() -> str:
+    """Parse the arguments and return the content of the config file."""
     def _parse() -> Namespace:
+        """Parse sys.argv (one positional argument: the config file)."""
         parser = ArgumentParser(
             description='Pac-Man game')
         parser.add_argument(

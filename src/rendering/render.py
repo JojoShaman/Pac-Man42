@@ -1,10 +1,12 @@
-from pygame import (Surface, draw, Rect, font, SRCALPHA)
+from pygame import SRCALPHA, Rect, Surface, draw, font
+
 from ..direction import Direction
-from ..maze.grid import Grid
 from ..game import Game
+from ..maze.grid import Grid
 
 
 def draw_hud(screen: Surface, game: Game, font: font.Font) -> None:
+    """Draw score, lives, level and time left at the top of the screen."""
     texts = (
         f"Score: {game.score}",
         f"Lives: {game.lives}",
@@ -21,12 +23,14 @@ def draw_hud(screen: Surface, game: Game, font: font.Font) -> None:
 def window_pos(x: float, y: float,
                offset_x: int, offset_y: int,
                cell_size: int) -> tuple[int, int]:
+    """Convert grid coordinates to window pixels."""
     return (
         int(offset_x + x * cell_size),
         int(offset_y + y * cell_size))
 
 
 def compute_layout(screen: Surface, maze: Grid) -> tuple[int, int, int]:
+    """Return (cell_size, offset_x, offset_y) so the maze fits the window."""
     w, h = screen.get_size()
     gw, gh = maze.width, maze.height
     free_h = h - h // 10
@@ -36,7 +40,9 @@ def compute_layout(screen: Surface, maze: Grid) -> tuple[int, int, int]:
     offset_y = h // 10
     return cell_size, offset_x, offset_y
 
+
 def render_maze(screen: Surface, grid: Grid) -> Surface:
+    """Draw the walls once on a surface (closed "42" cells filled blue)."""
     maze = Surface(screen.get_size(), SRCALPHA)
     background: Surface = Surface(screen.get_size(), SRCALPHA)
     background.fill('black')
@@ -59,7 +65,8 @@ def render_maze(screen: Surface, grid: Grid) -> Surface:
             if cell.has_wall(Direction.N):
                 draw.line(maze, 'white', top_left, top_right, line_width)
             if cell.has_wall(Direction.S):
-                draw.line(maze, 'white', bottom_left, bottom_right, line_width)
+                draw.line(
+                    maze, 'white', bottom_left, bottom_right, line_width)
             if cell.has_wall(Direction.E):
                 draw.line(maze, 'white', top_right, bottom_right, line_width)
             if cell.has_wall(Direction.W):

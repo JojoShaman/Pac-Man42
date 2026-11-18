@@ -1,28 +1,32 @@
-from dataclasses import (
-    dataclass,
-    fields,
-    field)
-from typing import Any, Callable
 import json
 import logging
+from dataclasses import dataclass, field, fields
+from typing import Any, Callable
 
 
 class ConfigError(Exception):
+    """Raised when a config value is invalid."""
+
     ...
 
 
 @dataclass
 class Level:
+    """Maze dimensions of one level."""
+
     width: int = 15
     height: int = 15
 
 
 def _default_tags() -> list[Level]:
+    """Return the 10 default levels."""
     return [Level() for _ in range(10)]
 
 
 @dataclass
 class Config:
+    """All the game settings, with their default values."""
+
     highscore_filename: str = "highscore.json"
     levels: list[Level] = field(default_factory=_default_tags)
     lives: int = 3
@@ -38,6 +42,8 @@ class Config:
 def _validate_int(
         value: object,
         min_value: int, max_value: int | None) -> int:
+    """Return value clamped to [min_value, max_value];
+        ConfigError if no int."""
     if not isinstance(value, int):
         raise ConfigError
     if value < min_value:
@@ -48,18 +54,21 @@ def _validate_int(
 
 
 def _validate_bool(value: object) -> bool:
+    """Return value if it is a bool, else raise ConfigError."""
     if not isinstance(value, bool):
         raise ConfigError
     return value
 
 
 def _validate_filename(value: object) -> str:
+    """Return value if it is a string, else raise ConfigError."""
     if not isinstance(value, str):
         raise ConfigError
     return value
 
 
 def _validate_level(value: object, nb_lvl: int) -> Level:
+    """Build a Level from a dict, clamping each dimension (logged)."""
     dimensions: dict[str, int] = {}
     if not isinstance(value, dict):
         raise ConfigError
@@ -75,6 +84,7 @@ def _validate_level(value: object, nb_lvl: int) -> Level:
 
 
 def _validate_levels(value: object) -> list[Level]:
+    """Return 10 levels: the valid given ones, completed by defaults."""
     if not isinstance(value, list):
         raise ConfigError
     levels: list[Level] = Config().levels
@@ -88,6 +98,11 @@ def _validate_levels(value: object) -> list[Level]:
 
 
 def load_config(content: str) -> Config:
+    """Parse the JSON content and return a Config.
+
+    Invalid keys fall back to their default (logged); unknown keys are
+    ignored. Invalid JSON raises ValueError.
+    """
     values: dict[str, Any] = {}
     keys = set(k.name for k in fields(Config))
     try:
