@@ -4,6 +4,7 @@ from ..context import Context
 from pygame.event import Event
 from ..game import Game
 from pygame import Surface
+import re
 from pygame.locals import (
     K_RETURN, K_BACKSPACE, KEYDOWN,
 )
@@ -33,7 +34,7 @@ class End(State):
             elif event.unicode:
                 char: str = event.unicode
                 if len(self.name) < 10:
-                    if char.isalpha() or char == " ":
+                    if re.fullmatch(r"[A-Za-z0-9]", char):
                         self.name += char
 
     def update(self, dt: float) -> "State | None":

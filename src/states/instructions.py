@@ -10,11 +10,11 @@ from pygame.locals import (
 
 INSTRUCTIONS = ("Control keys", "Rules")
 class Instructions(State):
-    def __init__(self, context: Context) -> None:
+    def __init__(self, context: Context, backdrop: Surface) -> None:
         self.context = context
         self.selected = 0
         self.state: State | None = self
-        self.backdrop: Surface = blur(self.context.screen)
+        self.backdrop: Surface = backdrop
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:

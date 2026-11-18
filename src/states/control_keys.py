@@ -3,7 +3,7 @@ from .instructions import Instructions
 from ..context import Context
 from pygame.event import Event
 from pygame import Surface, font
-from ..rendering.render import draw_controls_menu, blur
+from ..rendering.render import draw_controls_menu
 from pygame.locals import (
     K_ESCAPE, KEYDOWN
 )
@@ -15,9 +15,9 @@ KEYS: dict[str, str] = {
     "RIGHT": "arrow right  d",
     "Next Level": "N",
     "Previous Level": "P",
-    "Pause": "L",
+    "Pause/ Resume": "esc",
     "Add 1 life": "+",
-    "Remove - life": "-",
+    "Remove 1 life": "-",
     "Immortality": "1",
     "Super speed": "2",
     "Freeze ghosts": "3"
@@ -29,7 +29,6 @@ class Keys(State):
         self.selected = 0
         self.instructions = last_state
         self.state: State | None = self
-        self.backdrop: Surface = blur(self.context.screen)
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
@@ -42,4 +41,4 @@ class Keys(State):
         return self.state
 
     def render(self) -> None:
-        draw_controls_menu(self.context.screen, self.backdrop, KEYS)
+        draw_controls_menu(self.context.screen, self.instructions.backdrop, KEYS)

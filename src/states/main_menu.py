@@ -2,14 +2,14 @@ from .state import State
 from ..context import Context
 from pygame.event import Event
 from pygame import Surface
-from ..rendering.render import draw_main_menu
+from ..rendering.render import draw_main_menu, blur
 from pygame.locals import (
     K_UP, K_DOWN, K_RETURN, K_SPACE,
     K_w, K_s, K_z, KEYDOWN
 )
 
 class Main_Menu(State):
-    OPTIONS = ("Start Game", "View Highscores", "Instructions", "Exit")
+    OPTIONS = ("Start Game", "Instructions", "Exit")
 
     def __init__(self, context: Context) -> None:
         self.context = context
@@ -34,7 +34,7 @@ class Main_Menu(State):
                 if self.OPTIONS[self.selected] == "Instructions":
                     self.context.last_state = self
                     from .instructions import Instructions
-                    self.state = Instructions(self.context)
+                    self.state = Instructions(self.context, blur(self.context.screen))
                 if self.OPTIONS[self.selected] == "Exit":
                     self.state = None
 

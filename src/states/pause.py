@@ -6,7 +6,7 @@ from pygame.event import Event
 from pygame import Surface, font
 from ..rendering.render import draw_pause_menu, blur
 from pygame.locals import (
-    K_UP, K_DOWN, K_RETURN, K_SPACE,
+    K_UP, K_DOWN, K_RETURN, K_SPACE, K_ESCAPE,
     K_w, K_s, K_z, K_l, KEYDOWN
 )
 
@@ -17,6 +17,7 @@ class PauseMenu(State):
         self.selected = 0
         self.state: State | None = self
         self.backdrop: Surface = blur(self.context.screen)
+        self.playing: State | None = self.context.last_state
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
@@ -26,15 +27,15 @@ class PauseMenu(State):
                 self.selected = (self.selected - 1) % len(PAUSE_OPTIONS)
             elif event.key in (K_DOWN, K_s):
                 self.selected = (self.selected + 1) % len(PAUSE_OPTIONS)
-            elif event.key == K_l:
-                self.state = self.context.last_state
+            elif event.key == K_ESCAPE:
+                self.state = self.playing
             elif event.key in (K_RETURN, K_SPACE):
                 if PAUSE_OPTIONS[self.selected] == "Resume":
-                    self.state = self.context.last_state
+                    self.state = self.playing
                 if PAUSE_OPTIONS[self.selected] == "Instructions":
                     from .instructions import Instructions
                     self.context.last_state = self
-                    self.state = Instructions(self.context)
+                    self.state = Instructions(self.context, self.backdrop)
                 if PAUSE_OPTIONS[self.selected] == "Main Menu":
                     self.state = Main_Menu(self.context)
 

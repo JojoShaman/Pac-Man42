@@ -8,7 +8,7 @@ from ..context import Context
 from ..maze.grid import Grid
 from pygame import Surface, font
 from pygame.locals import (
-    K_UP, K_DOWN, K_LEFT, K_RIGHT, K_p,
+    K_UP, K_DOWN, K_LEFT, K_RIGHT, K_ESCAPE, K_p,
     K_w, K_a, K_s, K_d, K_z, K_q, K_n, K_l, K_f, KEYDOWN
 )
 from .end import End
@@ -45,7 +45,7 @@ class Playing(State):
                     self.intents.next_lvl = True
                 elif event.key == K_p:
                     self.intents.previous_lvl = True
-                elif event.key == K_l:
+                elif event.key == K_ESCAPE:
                     self.pause = True
                 elif event.unicode == "+":
                     self.game.lives += 1

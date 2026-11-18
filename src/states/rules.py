@@ -3,7 +3,7 @@ from .instructions import Instructions
 from ..context import Context
 from pygame.event import Event
 from pygame import Surface, font
-from ..rendering.render import draw_rules_menu, blur
+from ..rendering.render import draw_rules_menu
 from pygame.locals import (
     K_ESCAPE, KEYDOWN
 )
@@ -26,7 +26,6 @@ class Rules(State):
         self.selected = 0
         self.instructions = last_state
         self.state: State | None = self
-        self.backdrop: Surface = blur(self.context.screen)
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
@@ -39,4 +38,4 @@ class Rules(State):
         return self.state
 
     def render(self) -> None:
-        draw_rules_menu(self.context.screen, self.backdrop, RULES)
+        draw_rules_menu(self.context.screen, self.instructions.backdrop, RULES)

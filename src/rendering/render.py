@@ -296,16 +296,16 @@ def _draw_highscores(screen: Surface,
                      highscores: list[dict[str, Any]]) -> None:
     """Compact top 5 at the bottom of the screen."""
     w, h = screen.get_size()
-    top = int(h * 0.73)
+    top = int(h * 0.63)
     _blit_centered(screen, "HIGHSCORES", 30, YELLOW, (w // 2, top))
     if not highscores:
         _blit_centered(screen, "No score yet", 26, GREY, (w // 2, top + 34))
         return
-    for i, player in enumerate(highscores[:5]):
+    for i, player in enumerate(highscores[:10]):
         name = player['name']
         score = player['score']
         line = f"{i + 1}.  {name}  -  {score} pts"
-        _blit_centered(screen, line, 26, WHITE, (w // 2, top + 34 + i * 26))
+        _blit_centered(screen, line, 26, WHITE, (w // 2, top + 34 + i * 20))
 
 
 def draw_main_menu(screen: Surface, options: tuple[str, ...], selected: int,
@@ -323,7 +323,7 @@ def draw_main_menu(screen: Surface, options: tuple[str, ...], selected: int,
     _blit_centered(screen, "UP / DOWN to move  -  ENTER to select", 22, GREY,
                    (w // 2, h - 22))
 
-def blur(surface: Surface, factor: int = 20) -> Surface:
+def blur(surface: Surface, factor: int = 12) -> Surface:
     """Return a blurred copy: shrink then enlarge with smoothing."""
 
     w, h = surface.get_size()
@@ -366,17 +366,17 @@ def draw_controls_menu(screen: Surface, backdrop: Surface,
     veil.fill((0, 0, 0, 5))
     screen.blit(veil, (0, 0))
 
-    panel = Rect(0, 0, PANEL_W, 140 + len(options) * 58)
+    panel = Rect(0, 0, PANEL_W, 140 + len(options) * 38)
     panel.center = (w // 2, h // 2)
     draw.rect(screen, BACKGROUND, panel, border_radius=18)
     draw.rect(screen, BLUE, panel, width=3, border_radius=18)
 
     _blit_centered(screen, "KEYS", 64, YELLOW, (w // 2, panel.top + 50))
     for i, (key, value) in enumerate(options.items()):
-        midleft = (panel.left + 30, panel.top + 120 + i * 58)
-        midright = (panel.right - 30, panel.top + 120 + i * 58)
-        _blit_left(screen, key, 34, YELLOW, midleft)
-        _blit_right(screen, value, 34, YELLOW, midright)
+        midleft = (panel.left + 30, panel.top + 120 + i * 38)
+        midright = (panel.right - 30, panel.top + 120 + i * 38)
+        _blit_left(screen, key, 24, YELLOW, midleft)
+        _blit_right(screen, value, 24, YELLOW, midright)
 
 def draw_rules_menu(screen: Surface, backdrop: Surface,
                     options: list[str]) -> None:
