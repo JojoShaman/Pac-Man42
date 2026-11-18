@@ -1,9 +1,8 @@
-from .state import State
-from .instructions import Instructions
+from .state import StateName, State
 from ..context import Context
 from pygame.event import Event
-from pygame import Surface, font
-from ..rendering.render import draw_rules_menu
+from pygame import Surface
+from ..rendering.render import draw_rules_menu, blur
 from pygame.locals import (
     K_ESCAPE, KEYDOWN
 )
@@ -20,22 +19,23 @@ RULES: list[str] = [
     "• Clear all 10 levels to win.",
 ]
 
+
 class Rules(State):
-    def __init__(self, context: Context, last_state: Instructions) -> None:
+    def __init__(self, context: Context) -> None:
         self.context = context
         self.selected = 0
-        self.instructions = last_state
-        self.state: State | None = self
+        self.state: StateName | None = None
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
             if event.type != KEYDOWN:
                 continue
             if event.key == K_ESCAPE:
-                self.state = self.instructions
+                self.state = StateName.BACK
 
-    def update(self, dt: float) -> State | None:
-        return self.state
+    def update(self, dt: float) -> StateName | None:
+        next_state, self.state = self.state, None
+        return next_state
 
     def render(self) -> None:
-        draw_rules_menu(self.context.screen, self.instructions.backdrop, RULES)
+        draw_rules_menu(self.context.screen, self.context.backdrop, RULES)

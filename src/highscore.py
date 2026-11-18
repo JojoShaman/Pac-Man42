@@ -35,7 +35,8 @@ def _validate_highscore_content(scores: list[dict[str, Any]]) -> list[dict[str, 
     def _validate_scores() -> list[dict[str, Any]]:
         ret = []
         for player in scores:
-            if not re.fullmatch(r"[A-Za-z0-9]{1,10}", player["name"]) or player["score"] > sys.maxsize:
+            if (not re.fullmatch(r"[A-Za-z0-9 ]{1,10}", player["name"])
+                or player["score"] > sys.maxsize):
                 continue
             ret.append(player)
         return ret
@@ -52,7 +53,6 @@ def load_highscore(context: Context) -> None:
         print(e)
 
 def new_score(context: Context, new_: dict[str, Any]) -> None:
-    new_hs: list[dict[str, Any]] = []
     context.highscores.append(new_)
     tmp_path = context.file_path.with_name(context.file_path.name + ".tmp")
     with open(tmp_path, "w") as f:

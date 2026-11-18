@@ -1,4 +1,4 @@
-from .state import State
+from .state import State, StateName
 from ..context import Context
 from pygame.event import Event
 from pygame import Surface
@@ -9,12 +9,13 @@ from pygame.locals import (
 )
 
 INSTRUCTIONS = ("Control keys", "Rules")
+
+
 class Instructions(State):
-    def __init__(self, context: Context, backdrop: Surface) -> None:
+    def __init__(self, context: Context) -> None:
         self.context = context
         self.selected = 0
-        self.state: State | None = self
-        self.backdrop: Surface = backdrop
+        self.state: StateName | None = None
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
@@ -26,17 +27,15 @@ class Instructions(State):
                 self.selected = (self.selected + 1) % len(INSTRUCTIONS)
             elif event.key in (K_RETURN, K_SPACE):
                 if INSTRUCTIONS[self.selected] == "Control keys":
-                    from .control_keys import Keys
-                    self.state = Keys(self.context, self)
-                elif INSTRUCTIONS[self.selected] == "Rules":
-                    from .rules import Rules
-                    self.state = Rules(self.context, self)
+                    self.state = StateName.CONTROL_KEYS
+                if INSTRUCTIONS[self.selected] == "Rules":
+                    self.state = StateName.RULES
             elif event.key == K_ESCAPE:
-                self.state = self.context.last_state
+                self.state = StateName.BACK
 
-    def update(self, dt: float) -> State | None:
-        next_state, self.state = self.state, self
+    def update(self, dt: float) -> StateName | None:
+        next_state, self.state = self.state, None
         return next_state
 
     def render(self) -> None:
-        draw_pause_menu(self.context.screen, self.backdrop, INSTRUCTIONS, self.selected, "INSTRUCTIONS")
+        draw_pause_menu(self.context.screen, self.context.backdrop, INSTRUCTIONS, self.selected, "INSTRUCTIONS")

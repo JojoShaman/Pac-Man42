@@ -1,17 +1,17 @@
-from .state import State
+from .state import State, StateName
 from pygame.event import Event
 from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
-                                draw_super_pacgums, draw_hud, draw_start_timer, draw_ghost)
+                                draw_super_pacgums, draw_hud, draw_start_timer,
+                                draw_ghost)
 from ..game import Game, Intents
 from ..direction import Direction
-from ..context import Context
+from ..context import Context, GameResult
 from ..maze.grid import Grid
 from pygame import Surface, font
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT, K_ESCAPE, K_p,
     K_w, K_a, K_s, K_d, K_z, K_q, K_n, K_l, K_f, KEYDOWN
 )
-from .end import End
 
 _KEYS: dict[Direction, tuple[int, ...]] = {
     Direction.N: (K_UP, K_w, K_z),
@@ -33,7 +33,7 @@ class Playing(State):
         self.intents: Intents = Intents()
         self.context: Context = context
         self.pause: bool = False
-        self.state: State = self
+        self.state: StateName = StateName.PLAYING
 
     def handle_input(self, events: list[Event]) -> None:
         self.intents = Intents()
@@ -59,19 +59,23 @@ class Playing(State):
                 elif event.unicode == "3":
                     self.intents.freeze = self.intents.freeze == False
 
-    def update(self, dt) -> State | None:
+    def update(self, dt) -> StateName | None:
         self.game.update(dt, self.intents)
-        self.context.last_state = self
         if self.game.lives == 0 or self.game.time_left <= 0:
-            return End(self.context, self.game, False)
+            game_result_defeat = GameResult(self.game.score, False,
+                                            self.game.grid)
+            self.context.result = game_result_defeat
+            return StateName.GAME_OVER
         elif self.game.current_lvl == 9 and len(self.game.pacgums) == 0:
-            return End(self.context, self.game, True)
+            game_result_victory = GameResult(self.game.score, True,
+                                             self.game.grid)
+            self.context.result = game_result_victory
+            return StateName.GAME_OVER
         if self.pause:
-            from .pause import PauseMenu
             self.pause = False
             if self.m_surf:
-                return PauseMenu(self.context)
-        return self
+                return StateName.PAUSE
+        return None
 
     def render(self) -> None:
         if (self.m_surf is None or self.m_grid is not self.game.grid):

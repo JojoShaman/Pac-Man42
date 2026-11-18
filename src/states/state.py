@@ -1,6 +1,20 @@
 from abc import ABC, abstractmethod
 from pygame import Surface, font
 from pygame.event import Event
+from enum import Enum, auto
+
+
+class StateName(Enum):
+    MENU = auto()
+    PLAYING = auto()
+    HIGHSCORES = auto()
+    INSTRUCTIONS = auto()
+    CONTROL_KEYS = auto()
+    RULES = auto()
+    BACK = auto()
+    GAME_OVER = auto()
+    QUIT = auto()
+    PAUSE = auto()
 
 
 class State(ABC):
@@ -9,7 +23,7 @@ class State(ABC):
         pass
 
     @abstractmethod
-    def update(self, dt: float) -> "State | None":
+    def update(self, dt: float) -> StateName | None:
         pass
 
     @abstractmethod
