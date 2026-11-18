@@ -8,7 +8,6 @@ install:
 	@uv add mazegenerator-2.1.0-py3-none-any.whl
 	@uv sync
 
-
 debug:
 	uv run python -m pdb -m src
 
@@ -17,6 +16,9 @@ clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type d -name .pytest_cache -exec rm -rf {} +
 	find . -name .DS_Store -delete
+
+package:
+	uv run pyinstaller PacMan.spec
 
 lint:
 	uv run flake8 .

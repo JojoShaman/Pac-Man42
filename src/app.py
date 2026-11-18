@@ -4,7 +4,7 @@ from pygame.event import Event
 from .config import Config
 from .context import Context, GameResult
 from .highscore import get_highscore_path, load_highscore
-from .rendering.sprites import load_sprites
+from .rendering.sprites import load_sprites, resources_path
 from .rendering.user_interface import blur
 from .states import (
     End,
@@ -31,6 +31,7 @@ class App:
         pygame.init()
         self.font = pygame.font.Font(None, 24)
         self.screen = pygame.display.set_mode((500, 720))
+        pygame.display.set_caption("Pac-Man")
         self.context: Context = Context(
             config, self.font, self.screen,
             get_highscore_path(config.highscore_filename), [],
@@ -38,7 +39,8 @@ class App:
         load_highscore(self.context)
         self.states: list[State] = [MainMenu(self.context)]
         self.init_states()
-        self.icon = pygame.image.load("resources/game_icon.png")
+        self.icon = pygame.image.load(
+            resources_path("resources/game_icon.png"))
         pygame.display.set_icon(self.icon)
 
     def init_states(self) -> None:

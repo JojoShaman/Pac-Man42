@@ -10,6 +10,8 @@ from ..entities import Ghost, GhostMode, Player
 from ..game import Game
 from ..maze.grid import Grid
 from .render import compute_layout, window_pos
+from pathlib import Path
+import sys
 
 PACMAN: dict[str, Surface] = {}
 PM_ROTATE: dict[Direction, list[Surface]] = {}
@@ -17,6 +19,24 @@ STARTER: dict[int, Surface] = {}
 GHOSTS: dict[str, Surface] = {}
 EDIBLE: list[Surface] = []
 END: dict[str, Surface] = {}
+
+
+def is_frozen() -> bool:
+    """Return True if the game runs from a PyInstaller executable."""
+    if getattr(sys, "frozen", False):
+        return True
+    return False
+
+
+def resources_path(sprite_path: str) -> str:
+    """Return the absolute path of a resource,
+    in the project or the PyInstaller bundle."""
+    if is_frozen():
+        root = Path(getattr(sys, "_MEIPASS"))
+    else:
+        root = Path(__file__).resolve().parents[2]
+    sprite = root / sprite_path
+    return str(sprite)
 
 
 def load_sprites() -> None:
@@ -28,27 +48,30 @@ def load_sprites() -> None:
         (Direction.S, -90)
     ]
     PACMAN['closed'] = image.load(
-        "resources/pacman/pacman2.png").convert_alpha()
+        resources_path("resources/pacman/pacman2.png")).convert_alpha()
     PACMAN['open'] = image.load(
-        "resources/pacman/pacman0.png").convert_alpha()
+        resources_path("resources/pacman/pacman0.png")).convert_alpha()
     PACMAN['half'] = image.load(
-        "resources/pacman/pacman1.png").convert_alpha()
+        resources_path("resources/pacman/pacman1.png")).convert_alpha()
     PACMAN['closed1'] = image.load(
-        "resources/pacman/pacman2.png").convert_alpha()
+        resources_path("resources/pacman/pacman2.png")).convert_alpha()
     for _, pacman in PACMAN.items():
         for d, r in rotation:
             PM_ROTATE.setdefault(d, []).append(transform.rotate(pacman, r))
     for i in range(1, 4):
         STARTER[i] = image.load(
-            f"resources/starter/{i}_40x40.png")
+            resources_path(f"resources/starter/{i}_40x40.png"))
     for ghost in ["blinky", "pinky", "inky", "clyde"]:
         GHOSTS[ghost] = image.load(
-            f"resources/ghost_gang/{ghost}.png")
+            resources_path(f"resources/ghost_gang/{ghost}.png"))
     for i in range(2):
         EDIBLE.append(
-            image.load(f"resources/ghost_gang/edible/edible{i}.png"))
-    END["game_over"] = image.load("resources/end_game/GameOver.png")
-    END["you_win"] = image.load("resources/end_game/YouWon.png")
+            image.load(
+                resources_path(f"resources/ghost_gang/edible/edible{i}.png")))
+    END["game_over"] = image.load(
+        resources_path("resources/end_game/GameOver.png"))
+    END["you_win"] = image.load(
+        resources_path("resources/end_game/YouWon.png"))
 
 
 def draw_pacman(screen: Surface, player: Player, grid: Grid) -> None:
