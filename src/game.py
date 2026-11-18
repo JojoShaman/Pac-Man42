@@ -1,5 +1,5 @@
 import random
-from typing import Callable
+from typing import Callable, cast
 
 from .config import Level
 from .context import Context
@@ -93,7 +93,8 @@ class Game:
             """Create Inky (needs Blinky for its target)."""
             x, y = self.GHOST_INIT_POS[Inky]
             direction = self.GHOST_INIT_DIRECTION[Inky]
-            return Inky(x, y, direction, 3, self.player, self.ghosts["blinky"])
+            return Inky(x, y, direction, 3, self.player, cast(
+                Blinky, self.ghosts["blinky"]))
 
         def _init_clyde() -> Clyde:
             """Create Clyde (needs the grid for its target)."""

@@ -14,7 +14,7 @@ def get_highscore_path(filename: str) -> Path:
     """Return the highscore file path in the user data folder."""
     folder = user_data_path("PacMan")
     folder.mkdir(parents=True, exist_ok=True)
-    return folder / filename
+    return Path(folder / filename)
 
 
 def _validate_highscore_content(
