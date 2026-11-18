@@ -17,7 +17,6 @@ def command_line() -> str:
     try:
         if not is_frozen():
             config_path = Path(_parse().config_file)
-
         else:
             config_path = Path(sys.executable).parent / "config.json"
         with open(config_path, "r") as f:
