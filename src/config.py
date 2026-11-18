@@ -2,6 +2,7 @@ import json
 import logging
 from dataclasses import dataclass, field, fields
 from typing import Any, Callable
+from functools import partial
 
 
 class ConfigError(Exception):
@@ -112,9 +113,8 @@ def load_config(content: str) -> Config:
                 logging.warning(f"unknown key '{key}'")
                 continue
             try:
-                if key in INT_BOUNDS:
-                    min_v, max_v = INT_BOUNDS[key]
-                    v_value = VALIDATE[key](value, min_v, max_v)
+                if key in INT_V:
+                    v_value = VALIDATE[key](value)
                     values[key] = v_value
                     if value != v_value:
                         logging.warning(
@@ -132,28 +132,31 @@ def load_config(content: str) -> Config:
     return Config(**values)
 
 
-VALIDATE: dict[type[Any] | str | Any, Callable] = {
+VALIDATE: dict[str, Callable[[object], Any]] = {
     "highscore_filename": _validate_filename,
     "levels": _validate_levels,
-    "lives": _validate_int,
-    "pacgums": _validate_int,
-    "points_per_pacgum": _validate_int,
-    "points_per_super_pacgum": _validate_int,
-    "points_per_ghost": _validate_int,
-    "seed": _validate_int,
-    "level_max_time": _validate_int,
+    "lives": partial(
+        _validate_int, min_value=1, max_value=5),
+    "pacgums": partial(
+        _validate_int, min_value=1, max_value=1000),
+    "points_per_pacgum": partial(
+        _validate_int, min_value=0, max_value=1000),
+    "points_per_super_pacgum": partial(
+        _validate_int, min_value=0, max_value=5000),
+    "points_per_ghost": partial(
+        _validate_int, min_value=0, max_value=20000),
+    "seed": partial(
+        _validate_int, min_value=1, max_value=None),
+    "level_max_time": partial(
+        _validate_int, min_value=30, max_value=600),
     "cheat_mode": _validate_bool
 }
 
-INT_BOUNDS: dict[str, tuple[int, int | None]] = {
-    "lives": (1, 5),
-    "pacgums": (1, 1000),
-    "points_per_pacgum": (0, 1000),
-    "points_per_super_pacgum": (0, 5000),
-    "points_per_ghost": (0, 20000),
-    "seed": (1, None),
-    "level_max_time": (30, 600),
-}
+INT_V: list[str] = [
+    "lives", "pacgums", "points_per_pacgum",
+    "points_per_super_pacgum", "points_per_ghost",
+    "seed", "level_max_time"
+]
 
 LVL_DIMESION_BOUNDS: dict[str, tuple[int, int]] = {
     "width": (10, 50),
