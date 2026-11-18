@@ -4,6 +4,8 @@ from .states.main_menu import MainMenu
 from .states.playing import Playing
 from .states.end import End
 from .states.pause import PauseMenu
+from .states.rules import Rules
+from .states.control_keys import Keys
 from .states.instructions import Instructions
 from .rendering.render import load_sprites
 from .config import Config
@@ -33,7 +35,7 @@ class App:
         if name is StateName.RULES:
             return Rules(self.context)
         if name is StateName.CONTROL_KEYS:
-            return Control_keys(self.context)
+            return Keys(self.context)
         if name is StateName.GAME_OVER:
             result = self.context.result
             if result is not None:
@@ -42,7 +44,8 @@ class App:
 
     def _apply(self, requested: StateName, screen: pygame.Surface) -> bool:
 
-        OVERLAYS = {StateName.PAUSE, StateName.INSTRUCTIONS}
+        OVERLAYS = {StateName.PAUSE, StateName.INSTRUCTIONS,
+                    StateName.RULES, StateName.CONTROL_KEYS}
         if requested is StateName.QUIT:
             return False
         if requested is StateName.BACK:
