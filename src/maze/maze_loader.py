@@ -1,4 +1,4 @@
-from mazegenerator import MazeGenerator  # type: ignore[import-untyped]
+from mazegenerator import MazeGenerator
 
 from .grid import Cell, Grid
 

@@ -23,22 +23,22 @@ def _validate_highscore_content(
     def _sort_highscores() -> list[dict[str, Any]]:
         """Sort by score (descending) and keep the top 10."""
         hs = sorted(
-            _remove_duplicates(),
+            _validate_scores(),
             key=lambda player: player["score"],
             reverse=True)
-        return hs[:10]
+        return hs
 
     def _remove_duplicates() -> list[dict[str, Any]]:
         """Remove entries sharing the same name and score."""
-        seen: set[tuple[Any, Any]] = set()
+        seen: set[Any] = set()
         unique: list[dict[str, Any]] = []
-        for entry in _validate_scores():
-            key = (entry.get("name"), entry.get("score"))
+        for entry in _sort_highscores():
+            key = entry.get("name")
             if key in seen:
                 continue
             seen.add(key)
             unique.append(entry)
-        return unique
+        return unique[:10]
 
     def _validate_scores() -> list[dict[str, Any]]:
         """Keep entries with a valid name (1-10 alnum/space) and score."""
@@ -49,7 +49,7 @@ def _validate_highscore_content(
                 continue
             ret.append(player)
         return ret
-    return _sort_highscores()
+    return _remove_duplicates()
 
 
 def load_highscore(context: Context) -> None:
