@@ -1,8 +1,7 @@
 from .state import State, StateName
 from ..context import Context
 from pygame.event import Event
-from pygame import Surface, font
-from ..rendering.render import draw_controls_menu
+from ..rendering.user_interface import draw_controls_menu
 from pygame.locals import (
     K_ESCAPE, KEYDOWN
 )
@@ -41,4 +40,4 @@ class Keys(State):
         return next_state
 
     def render(self) -> None:
-        draw_controls_menu(self.context.screen, self.context.backdrop, KEYS)
+        draw_controls_menu(self.context, KEYS)

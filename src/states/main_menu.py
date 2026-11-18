@@ -2,7 +2,7 @@ from .state import State, StateName
 from ..context import Context
 from pygame.event import Event
 from pygame import Surface
-from ..rendering.render import draw_main_menu, blur
+from ..rendering.user_interface import draw_main_menu
 from pygame.locals import (
     K_UP, K_DOWN, K_RETURN, K_SPACE,
     K_w, K_s, K_z, KEYDOWN

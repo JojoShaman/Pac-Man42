@@ -1,16 +1,17 @@
 from .state import State, StateName
 from pygame.event import Event
-from ..rendering.render import (render_maze, draw_pacman, draw_pacgums,
-                                draw_super_pacgums, draw_hud, draw_start_timer,
-                                draw_ghost)
+from ..rendering.sprites import (
+    draw_pacman, draw_ghost, draw_pacgums,
+    draw_super_pacgums, draw_start_timer)
+from ..rendering.render import (render_maze, draw_hud)
 from ..game import Game, Intents
 from ..direction import Direction
 from ..context import Context, GameResult
 from ..maze.grid import Grid
-from pygame import Surface, font
+from pygame import Surface
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT, K_ESCAPE, K_p,
-    K_w, K_a, K_s, K_d, K_z, K_q, K_n, K_l, K_f, KEYDOWN
+    K_w, K_a, K_s, K_d, K_z, K_q, K_n, KEYDOWN
 )
 
 _KEYS: dict[Direction, tuple[int, ...]] = {
@@ -23,7 +24,6 @@ _KEYS: dict[Direction, tuple[int, ...]] = {
 K_DIRECTION: dict[int, Direction] = {
     key: direction for direction, keys in _KEYS.items() for key in keys
 }
-
 
 class Playing(State):
     def __init__(self, context: Context) -> None:
@@ -52,24 +52,23 @@ class Playing(State):
                 elif event.unicode == "-":
                     self.game.lives -= 1
                 elif event.unicode == "1":
-                    self.game.player.immortal = self.game.player.immortal == False
+                    self.game.player.immortal = (
+                        self.game.player.immortal == False)
                 elif event.unicode == "2":
                     speed = self.game.player.speed
                     self.game.player.speed = 6 if speed == 4 else 4
                 elif event.unicode == "3":
-                    self.intents.freeze = self.intents.freeze == False
+                    self.intents.freeze = (
+                        self.intents.freeze == False)
 
     def update(self, dt) -> StateName | None:
         self.game.update(dt, self.intents)
+        self.context.backdrop = self.context.screen
         if self.game.lives == 0 or self.game.time_left <= 0:
-            game_result_defeat = GameResult(self.game.score, False,
-                                            self.game.grid)
-            self.context.result = game_result_defeat
+            self.context.result = GameResult(self.game.score, False)
             return StateName.GAME_OVER
         elif self.game.current_lvl == 9 and len(self.game.pacgums) == 0:
-            game_result_victory = GameResult(self.game.score, True,
-                                             self.game.grid)
-            self.context.result = game_result_victory
+            self.context.result = GameResult(self.game.score, True)
             return StateName.GAME_OVER
         if self.pause:
             self.pause = False

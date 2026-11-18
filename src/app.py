@@ -1,19 +1,25 @@
-from .states.state import State, StateName
-# from .states.control_keys import Keys
-from .states.main_menu import MainMenu
-from .states.playing import Playing
-from .states.end import End
-from .states.pause import PauseMenu
-from .states.rules import Rules
-from .states.control_keys import Keys
-from .states.instructions import Instructions
-from .rendering.render import load_sprites, blur
+from .states import (
+    State,
+    StateName,
+    MainMenu,
+    Playing,
+    End,
+    PauseMenu,
+    Rules,
+    Keys,
+    Instructions
+)
+from .rendering.user_interface import blur
+from .rendering.sprites import load_sprites
 from .config import Config
 import pygame
 from pygame.event import Event
-from .context import Context
+from .context import Context, GameResult
 from .highscore import load_highscore, get_highscore_path
 
+STATES: dict[StateName, State] = {}
+OVERLAYS = {StateName.PAUSE, StateName.INSTRUCTIONS,
+            StateName.RULES, StateName.CONTROL_KEYS}
 class App:
     def __init__(self, config: Config) -> None:
         pygame.init()
@@ -22,42 +28,37 @@ class App:
         self.context: Context = Context(
             config, self.font, self.screen,
             get_highscore_path(config.highscore_filename), [],
-            blur(self.screen))
+            blur(self.screen), GameResult(0, False))
         load_highscore(self.context)
         self.states: list[State] = [MainMenu(self.context)]
+        self.init_states()
 
-    def _build_state(self, name: StateName) -> State:
-        if name is StateName.PLAYING:
-            return Playing(self.context)
-        if name is StateName.PAUSE:
-            return PauseMenu(self.context)
-        if name is StateName.INSTRUCTIONS:
-            return Instructions(self.context)
-        if name is StateName.RULES:
-            return Rules(self.context)
-        if name is StateName.CONTROL_KEYS:
-            return Keys(self.context)
-        if name is StateName.GAME_OVER:
-            result = self.context.result
-            if isinstance(self.states[-1], End):
-                return self.states[-1]
-            if result:
-                return End(self.context, result)
-        return MainMenu(self.context)
+    def init_states(self) -> None:
+        STATES[StateName.PLAYING] = Playing(self.context)
+        STATES[StateName.PAUSE] = PauseMenu(self.context)
+        STATES[StateName.INSTRUCTIONS] = Instructions(self.context)
+        STATES[StateName.RULES] = Rules(self.context)
+        STATES[StateName.CONTROL_KEYS] = Keys(self.context)
+        STATES[StateName.GAME_OVER] = End(self.context)
+        STATES[StateName.MENU] = MainMenu(self.context)
+
+    def new_game(self) -> None:
+        STATES[StateName.PLAYING] = Playing(self.context)
 
     def _apply(self, requested: StateName) -> bool:
-        OVERLAYS = {StateName.PAUSE, StateName.INSTRUCTIONS,
-                    StateName.RULES, StateName.CONTROL_KEYS}
         if requested is StateName.QUIT:
             return False
         if requested is StateName.BACK:
             if len(self.states) > 1:
                 self.states.pop()
         elif requested in OVERLAYS:
-            self.context.backdrop = blur(self.context.screen)
-            self.states.append(self._build_state(requested))
+            if self.states[-1] not in [STATES[name] for name in OVERLAYS]:
+                self.context.backdrop = blur(self.context.screen)
+            self.states.append(STATES[requested])
         else:
-            self.states = [self._build_state(requested)]
+            if requested == StateName.PLAYING:
+                self.new_game()
+            self.states = [STATES[requested]]
         return True
 
     def run(self) -> None:
@@ -73,7 +74,6 @@ class App:
             state = self.states[-1]
             state.handle_input(events)
             requested = state.update(dt)
-            # print(state)
             state.render()
             pygame.display.flip()
             if requested is not None and not self._apply(requested):

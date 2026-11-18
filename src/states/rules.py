@@ -1,8 +1,7 @@
 from .state import StateName, State
 from ..context import Context
 from pygame.event import Event
-from pygame import Surface
-from ..rendering.render import draw_rules_menu, blur
+from ..rendering.user_interface import draw_rules_menu
 from pygame.locals import (
     K_ESCAPE, KEYDOWN
 )
@@ -18,7 +17,6 @@ RULES: list[str] = [
     "• Lose all your lives and it's game over.",
     "• Clear all 10 levels to win.",
 ]
-
 
 class Rules(State):
     def __init__(self, context: Context) -> None:
@@ -38,4 +36,4 @@ class Rules(State):
         return next_state
 
     def render(self) -> None:
-        draw_rules_menu(self.context.screen, self.context.backdrop, RULES)
+        draw_rules_menu(self.context, RULES)

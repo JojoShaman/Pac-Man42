@@ -11,7 +11,7 @@ import pygame
 class GameResult:
     score: int
     won: bool
-    grid: Grid
+    # grid: Grid
 
 
 @dataclass
@@ -22,4 +22,4 @@ class Context:
     file_path: Path
     highscores: list[dict[str, Any]]
     backdrop: pygame.Surface
-    result: GameResult | None = None
+    result: GameResult

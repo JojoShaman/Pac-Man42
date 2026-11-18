@@ -1,13 +1,11 @@
 from .state import State, StateName
 from ..context import Context
 from pygame.event import Event
-from pygame import Surface, font
-from ..rendering.render import draw_pause_menu, blur
+from ..rendering.user_interface import draw_pause_menu
 from pygame.locals import (
     K_UP, K_DOWN, K_RETURN, K_SPACE, K_ESCAPE,
     K_w, K_s, K_z, KEYDOWN
 )
-
 
 class PauseMenu(State):
 
@@ -41,4 +39,4 @@ class PauseMenu(State):
 
     def render(self) -> None:
         labels = tuple(label for label, _ in self.OPTIONS)
-        draw_pause_menu(self.context.screen, self.context.backdrop, labels, self.selected, "PAUSE")
+        draw_pause_menu(self.context, labels, self.selected, "PAUSE")

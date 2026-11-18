@@ -1,8 +1,7 @@
 from .state import State, StateName
 from ..context import Context
 from pygame.event import Event
-from pygame import Surface
-from ..rendering.render import draw_pause_menu, blur
+from ..rendering.user_interface import draw_pause_menu
 from pygame.locals import (
     K_UP, K_DOWN, K_RETURN, K_SPACE, K_ESCAPE,
     K_w, K_s, K_z, KEYDOWN
@@ -38,4 +37,4 @@ class Instructions(State):
         return next_state
 
     def render(self) -> None:
-        draw_pause_menu(self.context.screen, self.context.backdrop, INSTRUCTIONS, self.selected, "INSTRUCTIONS")
+        draw_pause_menu(self.context, INSTRUCTIONS, self.selected, "INSTRUCTIONS")
