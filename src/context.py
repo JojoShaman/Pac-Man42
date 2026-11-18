@@ -14,6 +14,6 @@ class GameResult:
 @dataclass
 class Context:
     config: Config
-    screen: pygame.Surface
     font: pygame.font.Font
+    screen: pygame.Surface
     result: GameResult | None = None
