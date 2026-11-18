@@ -173,7 +173,7 @@ def draw_rules_menu(context: Context,
         _blit_left(s, rule, 24, YELLOW, midleft)
 
 def draw_end(context: Context, fade: float,
-             name: str, font: font.Font) -> None:
+             name: str, font: font.Font, name_error: bool) -> None:
     s = context.screen
     b = context.backdrop
     score = context.result.score
@@ -192,16 +192,20 @@ def draw_end(context: Context, fade: float,
         return
     center_y = h // 2
 
-    score_font = font.render(f"SCORE  {score}", True, TEXT_COLOR)
+    score_font = font.render(f"SCORE  {score}", True, "white")
     s.blit(score_font,
                 score_font.get_rect(center=(w // 2, center_y - 60)))
-
-    label = font.render("ENTER YOUR NAME", True, TEXT_COLOR)
+    f_color = "red" if name_error else "white"
+    label_text = "WRONG ENTRY" if name_error else "ENTER YOUR NAME"
+    label = font.render(label_text, True, f_color)
     s.blit(label, label.get_rect(center=(w // 2, center_y - 20)))
 
+    bar_color = "red" if name_error else "white"
     bar = Rect((0, 0), INPUT_BAR_SIZE)
     bar.center = (w // 2, center_y + 30)
-    draw.rect(s, TEXT_COLOR, bar, 2)
+    draw.rect(s, bar_color, bar, 2)
 
-    text = font.render(name, True, TEXT_COLOR)
+    text_color = "red" if name_error else "white"
+    text_display = "press enter" if name_error else name
+    text = font.render(text_display, True, text_color)
     s.blit(text, text.get_rect(center=bar.center))

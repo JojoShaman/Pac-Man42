@@ -16,21 +16,21 @@ def get_highscore_path(filename: str) -> Path:
 def _validate_highscore_content(scores: list[dict[str, Any]]) -> list[dict[str, Any]]:
     def _sort_highscores() -> list[dict[str, Any]]:
         hs = sorted(
-            _remove_duplicates(),
+            _validate_scores(),
             key=lambda player: player["score"],
             reverse=True)
-        return hs[:10]
+        return hs
 
     def _remove_duplicates() -> list[dict[str, Any]]:
-        seen: set[tuple[Any, Any]] = set()
+        seen: set[Any] = set()
         unique: list[dict[str, Any]] = []
-        for entry in _validate_scores():
-            key = (entry.get("name"), entry.get("score"))
+        for entry in _sort_highscores():
+            key = entry.get("name")
             if key in seen:
                 continue
             seen.add(key)
             unique.append(entry)
-        return unique
+        return unique[:10]
 
     def _validate_scores() -> list[dict[str, Any]]:
         ret = []
@@ -40,7 +40,7 @@ def _validate_highscore_content(scores: list[dict[str, Any]]) -> list[dict[str, 
                 continue
             ret.append(player)
         return ret
-    return _sort_highscores()
+    return _remove_duplicates()
 
 def load_highscore(context: Context) -> None:
     highscores: list[dict[str, Any]] = []

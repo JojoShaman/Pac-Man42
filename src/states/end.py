@@ -17,6 +17,12 @@ class End(State):
         self.name: str = ""
         self.backdrop: Surface = self.context.backdrop
         self.elapsed: float = 0.0
+        self.error: bool = False
+
+    def _validate_name(self) -> bool:
+        if re.fullmatch(r"[A-Za-z0-9 ]{1,10}", self.name):
+            return True
+        return False
 
     def handle_input(self, events: list[Event]) -> None:
         for event in events:
@@ -25,16 +31,19 @@ class End(State):
             if event.key == K_BACKSPACE:
                 self.name = self.name[:-1]
             elif event.key == K_RETURN:
-                new_score(self.context,
-                          {"name": self.name,
-                           "score": self.context.result.score})
-                load_highscore(self.context)
-                self.state = StateName.MENU
+                if not self.error and self._validate_name():
+                    new_score(self.context,
+                            {"name": self.name,
+                            "score": self.context.result.score})
+                    load_highscore(self.context)
+                    self.state = StateName.MENU
+                else:
+                    self.error = self.error == False
+                self.name = ""
             elif event.unicode:
                 char: str = event.unicode
                 if len(self.name) < 10:
-                    if re.fullmatch(r"[A-Za-z0-9]", char):
-                        self.name += char
+                    self.name += char
 
     def update(self, dt: float) -> StateName | None:
         self.elapsed += dt
@@ -43,4 +52,4 @@ class End(State):
 
     def render(self) -> None:
         fade = self.elapsed / 0.5
-        draw_end(self.context, fade, self.name, self.context.font)
+        draw_end(self.context, fade, self.name, self.context.font, self.error)
