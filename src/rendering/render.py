@@ -242,7 +242,6 @@ def get_font(size: int) -> Font:
     """Return a font of this size, created on first use."""
     return Font(None, size)
 
-
 def _blit_centered(screen: Surface, text: str, size: int,
                    color: tuple[int, int, int], center: tuple[int, int]
                    ) -> None:

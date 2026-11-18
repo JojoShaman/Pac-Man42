@@ -3,7 +3,8 @@ from .states.state import State, StateName
 from .states.main_menu import MainMenu
 from .states.playing import Playing
 from .states.end import End
-# from .states.pause import PauseMenu
+from .states.pause import PauseMenu
+from .states.instructions import Instructions
 from .rendering.render import load_sprites
 from .config import Config
 import pygame
@@ -15,18 +16,41 @@ class App:
     def __init__(self, config: Config) -> None:
         pygame.init()
         self.context: Context = Context(config)
-        self.state: State = MainMenu(self.context)
+        self.states: list[State] = [MainMenu(self.context)]
 
-    def _build_state(self, name: StateName) -> State:
+    def current(self) -> State:
+        return self.states[-1]
+
+    def _build_state(self, name: StateName, screen: pygame.Surface) -> State:
         if name is StateName.PLAYING:
             return Playing(self.context)
-        elif name is StateName.SETTINGS:
-            ...
-        elif name is StateName.GAME_OVER:
-            if self.context.result is None:
-                return MainMenu(self.context)
-            return End(self.context, self.context.result)
+        if name is StateName.PAUSE:
+            return PauseMenu(self.context, screen)
+        if name is StateName.INSTRUCTIONS:
+            return Instructions(self.context, screen)
+        if name is StateName.RULES:
+            return Rules(self.context)
+        if name is StateName.CONTROL_KEYS:
+            return Control_keys(self.context)
+        if name is StateName.GAME_OVER:
+            result = self.context.result
+            if result is not None:
+                return End(self.context, result)
         return MainMenu(self.context)
+
+    def _apply(self, requested: StateName, screen: pygame.Surface) -> bool:
+
+        OVERLAYS = {StateName.PAUSE, StateName.INSTRUCTIONS}
+        if requested is StateName.QUIT:
+            return False
+        if requested is StateName.BACK:
+            if len(self.states) > 1:
+                self.states.pop()
+        elif requested in OVERLAYS:
+            self.states.append(self._build_state(requested, screen))
+        else:
+            self.states = [self._build_state(requested, screen)]
+        return True
 
     def run(self) -> None:
         font_size = 12
@@ -42,13 +66,12 @@ class App:
             for event in events:
                 if event.type == pygame.QUIT:
                     running = False
-            self.state.handle_input(events)
-            requested = self.state.update(dt)
-            if requested is StateName.QUIT:
-                running = False
-            elif requested is not None:
-                self.state = self._build_state(requested)
-            self.state.render(screen, font)
+            state = self.current()
+            state.handle_input(events)
+            requested = state.update(dt)
+            state.render(screen, font)
             pygame.display.flip()
+            if requested is not None and not self._apply(requested, screen):
+                running = False
             dt = min(clock.tick(60) / 1000, 0.05)
         pygame.quit()

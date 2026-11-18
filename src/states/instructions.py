@@ -29,7 +29,9 @@ class Instructions(State):
                 self.selected = (self.selected + 1) % len(INSTRUCTIONS)
             elif event.key in (K_RETURN, K_SPACE):
                 if INSTRUCTIONS[self.selected] == "Control keys":
-                    self.state = StateName.SETTINGS  # KEYS
+                    self.state = StateName.CONTROL_KEYS
+                if INSTRUCTIONS[self.selected] == "Rules":
+                    self.state = StateName.RULES
             elif event.key == K_ESCAPE:
                 self.state = StateName.BACK
 

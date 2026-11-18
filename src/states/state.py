@@ -8,8 +8,9 @@ class StateName(Enum):
     MENU = auto()
     PLAYING = auto()
     HIGHSCORES = auto()
-    SETTINGS = auto()
     INSTRUCTIONS = auto()
+    CONTROL_KEYS = auto()
+    RULES = auto()
     BACK = auto()
     GAME_OVER = auto()
     QUIT = auto()
@@ -28,5 +29,3 @@ class State(ABC):
     @abstractmethod
     def render(self, screen: Surface, font: font.Font) -> None:
         pass
-
-
