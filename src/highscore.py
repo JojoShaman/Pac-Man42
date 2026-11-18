@@ -43,12 +43,16 @@ def _validate_highscore_content(scores: list[dict[str, Any]]) -> list[dict[str, 
     return _sort_highscores()
 
 def load_highscore(context: Context) -> None:
+    highscores: list[dict[str, Any]] = []
+    bak_path = context.file_path.with_name(context.file_path.name + ".bak")
     try:
         with open(context.file_path, "r", encoding="utf-8") as f:
-            highscores: list[dict[str, Any]] = json.load(f)
-        context.highscores = _validate_highscore_content(highscores)
+            highscores = json.load(f)
+            context.highscores = _validate_highscore_content(highscores)
     except ValueError as e:
+        os.replace(context.file_path, bak_path)
         print(e)
+        print("saved backup to:", bak_path)
     except OSError as e:
         print(e)
 
