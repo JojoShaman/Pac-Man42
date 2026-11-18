@@ -32,6 +32,8 @@ class App:
         load_highscore(self.context)
         self.states: list[State] = [MainMenu(self.context)]
         self.init_states()
+        self.icon = pygame.image.load("resources/game_icon.png")
+        pygame.display.set_icon(self.icon)
 
     def init_states(self) -> None:
         STATES[StateName.PLAYING] = Playing(self.context)
