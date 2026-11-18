@@ -4,5 +4,5 @@
 .python-version
 src/__pycache__
 __pycache__
-dist
+pacman42
 build

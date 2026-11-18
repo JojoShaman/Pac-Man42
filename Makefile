@@ -15,15 +15,22 @@ clean:
 	find . -type d -name .mypy_cache -exec rm -rf {} +
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type d -name .pytest_cache -exec rm -rf {} +
+	find . -type d -name pacman42 -exec rm -rf {} +
+	find . -type d -name build -exec rm -rf {} +
 	find . -name .DS_Store -delete
 
 package:
-	uv run pyinstaller PacMan.spec
+	uv run pyinstaller PacMan.spec --distpath pacman42
+	cp package/README.txt pacman42
+	cp config.json pacman42
 
 lint:
 	uv run flake8 .
-	uv run mypy --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs .
+	uv run mypy --warn-return-any --warn-unused-ignores --ignore-missing-imports \
+	--disallow-untyped-defs --check-untyped-defs .
 
 lint-strict:
 	uv run flake8 .
 	uv run mypy . --strict
+
+.PHONY: install run debug clean package lint lint-strict
