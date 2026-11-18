@@ -8,6 +8,7 @@ from platformdirs import user_data_path
 from .context import Context
 import logging
 
+
 def get_highscore_path(filename: str) -> Path:
     """Return the highscore file path in the user data folder."""
     folder = user_data_path("PacMan")

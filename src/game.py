@@ -17,6 +17,7 @@ from .maze.grid import Grid
 from .maze.maze_loader import process_maze
 import logging
 
+
 class Intents:
     """Player intentions for one frame, filled by the Playing screen."""
 
