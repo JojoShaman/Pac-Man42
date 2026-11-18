@@ -108,6 +108,9 @@ def load_config(content: str) -> Config:
     keys = set(k.name for k in fields(Config))
     try:
         config_load: dict[str, Any] = json.loads(content)
+        if not isinstance(config_load, dict):
+            logging.error("config file is not valid JSON, using defaults")
+            return Config()
         for key, value in config_load.items():
             if key not in keys:
                 logging.warning(f"unknown key '{key}'")
@@ -123,12 +126,11 @@ def load_config(content: str) -> Config:
                     values[key] = VALIDATE[key](value)
             except ConfigError:
                 logging.error(f"invalid value for {key}, using default")
-                ...
         for k in keys:
             if k not in config_load:
                 logging.warning(f"missing key '{k}'")
-    except ValueError as e:
-        raise ValueError(e)
+    except ValueError:
+        logging.error("config file is not valid JSON, using defaults")
     return Config(**values)
 
 

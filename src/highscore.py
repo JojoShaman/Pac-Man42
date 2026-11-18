@@ -4,11 +4,9 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
-
 from platformdirs import user_data_path
-
 from .context import Context
-
+import logging
 
 def get_highscore_path(filename: str) -> Path:
     """Return the highscore file path in the user data folder."""
@@ -19,7 +17,7 @@ def get_highscore_path(filename: str) -> Path:
 
 def _validate_highscore_content(
         scores: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Drop invalid and duplicate entries, return the 10 best sorted."""
+    """Drop invalid and duplicate entries"""
     def _sort_highscores() -> list[dict[str, Any]]:
         """Sort by score (descending) and keep the top 10."""
         hs = sorted(
@@ -29,7 +27,7 @@ def _validate_highscore_content(
         return hs
 
     def _remove_duplicates() -> list[dict[str, Any]]:
-        """Remove entries sharing the same name and score."""
+        """Remove entries sharing the same name, return the 10 best sorted."""
         seen: set[Any] = set()
         unique: list[dict[str, Any]] = []
         for entry in _sort_highscores():
@@ -62,10 +60,10 @@ def load_highscore(context: Context) -> None:
             context.highscores = _validate_highscore_content(highscores)
     except ValueError as e:
         os.replace(context.file_path, bak_path)
-        print(e)
-        print("saved backup to:", bak_path)
+        logging.error(e)
+        logging.warning("saved backup to:", bak_path)
     except OSError as e:
-        print(e)
+        logging.error(e)
 
 
 def new_score(context: Context, new_: dict[str, Any]) -> None:

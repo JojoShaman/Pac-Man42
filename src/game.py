@@ -1,6 +1,5 @@
 import random
 from typing import Callable, cast
-
 from .config import Level
 from .context import Context
 from .direction import Direction
@@ -16,7 +15,7 @@ from .entities import (
 )
 from .maze.grid import Grid
 from .maze.maze_loader import process_maze
-
+import logging
 
 class Intents:
     """Player intentions for one frame, filled by the Playing screen."""
@@ -131,7 +130,7 @@ class Game:
         candidates = self._pacgum_candidates()
         count = min(self.context.config.pacgums, len(candidates))
         if count < self.context.config.pacgums:
-            print(f"pacgums clamped {count} (number of free cells)")
+            logging.warning(f"pacgums clamped {count} (number of free cells)")
         return random.sample(candidates, count)
 
     def init_super_pacgums(self) -> list[tuple[int, int]]:
