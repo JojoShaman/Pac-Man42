@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 import sys
 import re
+import logging
 
 def get_highscore_path(filename: str) -> Path:
     folder = user_data_path("PacMan")
@@ -51,10 +52,10 @@ def load_highscore(context: Context) -> None:
             context.highscores = _validate_highscore_content(highscores)
     except ValueError as e:
         os.replace(context.file_path, bak_path)
-        print(e)
-        print("saved backup to:", bak_path)
+        logging.error(e)
+        logging.warning("saved backup to:", bak_path)
     except OSError as e:
-        print(e)
+        logging.error(e)
 
 def new_score(context: Context, new_: dict[str, Any]) -> None:
     context.highscores.append(new_)
