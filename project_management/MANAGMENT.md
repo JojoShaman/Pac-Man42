@@ -1,7 +1,7 @@
 
 # Pac-Man — Project Management
 
-*Authors: tmattela, Srosu — 42 curriculum, PAC-MAN project.*
+*Authors: tmattela, Srosu*
 
 
 ---
@@ -22,8 +22,8 @@
 | Collision logic | | ✔ |
 | Highscore system (load, validate, atomic save) | | ✔ |
 | Pygame main loop and global architecture | | ✔ |
-| Configuration file and command line **[?]** |  | ✔ |
-| Makefile, linting (flake8 / mypy), docstrings **[?]** | ✔ |  |
+| Configuration file and command line |  | ✔ |
+| Makefile, linting (flake8 / mypy), docstrings | ✔ |  |
 | README | ✔ |  |
 | Build and Deployment |  | ✔ |
 
