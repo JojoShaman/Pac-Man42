@@ -214,8 +214,6 @@ class Game:
             not self.pacgums
             ]
         if any(skips) or self.restart_level:
-            if self.restart_level:
-                self.restart_lvl()
             if skips[0] or skips[2]:
                 self.next_level()
             elif skips[1]:
@@ -223,6 +221,8 @@ class Game:
             self.init_ghosts()
             self.load_level()
             self.start_timer = 3
+            if self.restart_level:
+                self.restart_lvl()
         return _wait()
 
     def next_level(self) -> None:
@@ -242,8 +242,9 @@ class Game:
     def load_level(self) -> None:
         """Rebuild grid, pacgums, player and timer for the current level."""
         self.grid = self.get_grid()
-        self.pacgums = self.init_pacgums()
-        self.super_pacgums = self.init_super_pacgums()
+        if not self.restart_level:
+            self.pacgums = self.init_pacgums()
+            self.super_pacgums = self.init_super_pacgums()
         self.set_player_pos()
         self.time_left = self.context.config.level_max_time
         self.player.direction = Direction.S

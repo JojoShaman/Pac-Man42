@@ -23,6 +23,7 @@ package:
 	uv run pyinstaller PacMan.spec --distpath pacman42
 	cp package/README.txt pacman42
 	cp config.json pacman42
+	zip -r pacman42.zip pacman42
 
 lint:
 	uv run flake8 .
