@@ -83,7 +83,7 @@ The configuration file is **JSON with comments**: every line starting with `#` (
 | `points_per_ghost` | integer | `200` | Positive, at most 20 000 |
 | `seed` | integer | `42` | Positive. Used for the **first level only**; the next levels use random seeds. |
 | `level_max_time` | integer (seconds) | `90` | 30 to 600 |
-| `cheat_mode` | boolean | `false` | `true` or `false` only (no string, no integer) |
+| `cheat_mode` | integer | none | 1, 2, 3 to activate the cheat mode |
 
 Integer keys explicitly reject booleans: in Python `True` and `False` are instances of `int`, so a plain `isinstance` check would accept them.
 
@@ -106,7 +106,6 @@ Example:
     "points_per_ghost": 200,
     "seed": 42,
     "level_max_time": 90,
-    "cheat_mode": false
 }
 ```
 
@@ -183,15 +182,17 @@ def process_maze(width: int, height: int, seed: int) -> Grid
 
 ### Cheat mode
 
-Enabled with `"cheat_mode": true` in the configuration (and from the settings). It lets a reviewer test every feature quickly:
+Enabled with the touch 1,2,3 during the game to activate the cheat modes. It lets a reviewer test every feature quickly:
 
 | Key | Effect |
 |---|---|
-| `S` | Skip the level (win it immediately) |
-| `I` | Invincibility (no life lost) |
-| `F` | Freeze the ghosts |
-| `L` | Add extra lives |
-| `Space` | Increase the player's speed |
+| `n` | Skip the level (win it immediately) |
+| `p` | Previous Level |
+| `1` | Invincibility (no life lost) |
+| `2` | Increase the player's speed |
+| `3` | Freeze the ghosts |
+| `+` | Add extra lives |
+| `-` | Remove 1 life |
 
 ## General Software Architecture
 
