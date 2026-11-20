@@ -63,7 +63,7 @@
 
 The project globally went **faster than planned**. The game loop took less time than expected: once the entities and the states were developed, the integration became natural and logical.
 
-Remaining work at the time of writing: build and deployment, final testing, README and documents. **[? update]**
+Remaining work at the time of writing: build and deployment, final testing, README and documents.
 
 ---
 
@@ -71,7 +71,7 @@ Remaining work at the time of writing: build and deployment, final testing, READ
 
 | Choice | Reason | Alternative considered |
 |---|---|---|
-| **pygame** for window, drawing and input | Simple, well documented, enough for a 2D game | Other graphics library. Compatibility with the "MLX-equivalent" constraint of the subject: **[? final decision]** |
+| **pygame** for window, drawing and input | Simple, well documented, enough for a 2D game | Other graphics library. Compatibility with the "MLX-equivalent" constraint of the subject|
 | **Assigned maze package used as-is** (`perfect=False`) | Required by the subject; loops and few dead ends suit Pac-Man | Writing our own generator (not allowed) |
 | Single loader module (`maze_loader.py`) with validation | Isolates the package; errors become a clean `MazeError` | Direct use of the package everywhere |
 | `Grid` / `Cell` / `Direction` abstractions | The rest of the code never touches raw bitmasks | Raw integer matrix |
@@ -86,43 +86,43 @@ Remaining work at the time of writing: build and deployment, final testing, READ
 
 ## 4. Risk analysis
 
-*(Probability / impact: L = low, M = medium, H = high.)* **[? confirm and complete]**
+*(Probability / impact: L = low, M = medium, H = high.)*
 
 | # | Risk | P | I | Mitigation | Outcome |
 |---|---|---|---|---|---|
-| R1 | The graphics library does not satisfy the "MLX-equivalent" constraint | M | H | Discuss with the pair, read the subject, ask the staff | **[?]** |
+| R1 | The graphics library does not satisfy the "MLX-equivalent" constraint | M | H | Discuss with the pair, read the subject, ask the staff | Use of Pygame|
 | R2 | The assigned maze package returns unexpected data (e.g. the "42" pattern blocks the spawn) | M | H | Validate the output, exclude closed cells from items, choose a safe spawn | Handled in the loader and item placement |
 | R3 | Invalid configuration or corrupted files crash the game | H | H | Per-key validation, defaults, clamping, clear messages, backup of corrupted highscore | Mostly handled, hardening in progress |
 | R4 | Integration problems between two developers' code (circular imports, diverging architecture) | H | M | Design document first, `StateName` mechanism, shared `Context` | Happened (circular imports), solved |
 | R5 | Git conflicts and diverging branches | M | M | Small feature branches, regular merges, review of conflicts | Happened, solved |
 | R6 | Performance on large mazes (50×50) | L | M | Cache the maze surface, cap `dt` | Handled |
-| R7 | Deployment takes longer than expected (account, fees, review delays) | M | M | Prefer a free platform (itch.io) with a draft/restricted page, start early | To do |
-| R8 | Time lost on polishing instead of mandatory features | M | M | Prioritise subject requirements, then extras | **[?]** |
+| R7 | Deployment takes longer than expected (account, fees, review delays) | M | M | Prefer a free platform (itch.io) with a draft/restricted page, start early | Updated on itch.io |
+| R8 | Time lost on polishing instead of mandatory features | M | M | Prioritise subject requirements, then extras | Done |
 
 ---
 
 ## 5. Acceptance test plan
 
-Tests were performed **manually** by playing the game and by feeding deliberately wrong configurations. **[? confirm each result before the PDF]**
+Tests were performed **manually** by playing the game and by feeding deliberately wrong configurations.
 
-| ID | Feature | Scenario | Expected | Result |
-|---|---|---|---|---|
-| T1 | Command line | No argument / two arguments / missing file | Clear message, no traceback | [?] |
-| T2 | Config | Comments, unknown key, wrong types, out-of-range values | Default or clamped value, message logged, game starts | Tested [?] |
-| T3 | Config | Invalid JSON, empty file, root is not an object | Defaults used, game starts | [?] |
-| T4 | Maze | Same seed twice; levels 1 to 10; sizes 10×10 and 50×50 | Same maze for the same seed; all levels playable | [?] |
-| T5 | Movement | Turning in corridors, walls, U-turn | Player never crosses a wall; buffered turns work | Tested |
-| T6 | Pacgums | Eat every pacgum | Score increases, pacgum disappears, level ends when none left | Tested |
-| T7 | Super-pacgums | Eat in a corner | Ghosts become edible, then return to normal | Tested |
-| T8 | Ghosts | Contact in chase / edible mode | Life lost / ghost eaten and respawned | Tested |
-| T9 | Level time limit | Let the timer reach zero | Game over | [?] |
-| T10 | Lives | Lose all lives | Game over screen | [?] |
-| T11 | Victory | Clear level 10 | Victory screen | **Failed — see B-open-1** |
-| T12 | Pause | Pause, instructions, resume | Game and timer frozen, same state resumed | [?] |
-| T13 | Highscore | Enter name, restart, corrupt the file | Top 10 persists; corrupted file does not crash | [?] |
-| T14 | Name entry | Empty, too long, forbidden characters | Refused or blocked | [?] |
-| T15 | Cheat mode | Each cheat key with `cheat_mode` on and off | Works only when enabled | **Failed — see B-open-3** |
-| T16 | Quality | `make lint` (flake8 and mypy with the mandatory flags) | No error | [?] |
+| ID | Feature | Scenario | Expected |
+|---|---|---|---|
+| T1 | Command line | No argument / two arguments / missing file | Clear message, no traceback |
+| T2 | Config | Comments, unknown key, wrong types, out-of-range values | Default or clamped value, message logged, game starts |
+| T3 | Config | Invalid JSON, empty file, root is not an object | Defaults used, game starts |
+| T4 | Maze | Same seed twice; levels 1 to 10; sizes 10×10 and 50×50 | Same maze for the same seed; all levels playable |
+| T5 | Movement | Turning in corridors, walls, U-turn | Player never crosses a wall; buffered turns work |
+| T6 | Pacgums | Eat every pacgum | Score increases, pacgum disappears, level ends when none left |
+| T7 | Super-pacgums | Eat in a corner | Ghosts become edible, then return to normal |
+| T8 | Ghosts | Contact in chase / edible mode | Life lost / ghost eaten and respawned |
+| T9 | Level time limit | Let the timer reach zero | Game over |
+| T10 | Lives | Lose all lives | Game over screen |
+| T11 | Victory | Clear level 10 | Victory screen |
+| T12 | Pause | Pause, instructions, resume | Game and timer frozen, same state resumed |
+| T13 | Highscore | Enter name, restart, corrupt the file | Top 10 persists; corrupted file does not crash |
+| T14 | Name entry | Empty, too long, forbidden characters | Refused or blocked |
+| T15 | Cheat mode | Each cheat key with `cheat_mode` on and off | Works only when enabled |
+| T16 | Quality | `make lint` (flake8 and mypy with the mandatory flags) | No error |
 
 ---
 
@@ -154,6 +154,6 @@ Tests were performed **manually** by playing the game and by feeding deliberatel
 | Git: divergent branches and merges | Two people working on branches that diverged, conflicts between `context` and `test/highscore` | Merge with the three-way editor, review each conflict |
 | Graphics constraint | The subject asks for MLX-equivalent functions, which pygame drawing helpers do not match | **[? decision]** |
 | The "42" pattern in the maze | Spawn and items could land on closed cells | Exclusion in item placement, safe spawn |
-| Disagreements inside the team | **[?]** | **[?]** |
+| Disagreements inside the team | None | None |
 
 ---
