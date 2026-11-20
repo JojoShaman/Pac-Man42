@@ -30,7 +30,7 @@ class App:
         """Init pygame, the shared context, the highscores and the states."""
         pygame.init()
         self.font = pygame.font.Font(None, 24)
-        self.screen = pygame.display.set_mode((500, 720))
+        self.screen = pygame.display.set_mode((1000, 1440))
         pygame.display.set_caption("Pac-Man")
         self.context: Context = Context(
             config, self.font, self.screen,
